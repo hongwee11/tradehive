@@ -1,15 +1,17 @@
 body {
-    font-family: sans-serif; /* Sets a common, easy-to-read font for the whole page */
-    margin: 20px;          /* Adds some space around the content so it doesn't touch the edges */
+    font-family: sans-serif;
+    margin: 20px;
+    background: #10162a; 
+    color: #f5f6fa;      
 }
 
 h1 {
-    color: #333;         /* Changes the color of the main heading to dark gray */
+    color: #f5f6fa;         /* Changes the color of the main heading to dark gray */
     text-align: center;  /* Centers the heading text */
 }
 
 p {
-    color: #666;         /* Changes the color of paragraphs to a lighter gray */
+    color: #b0b8d1;         /* Changes the color of paragraphs to a lighter gray */
     line-height: 1.5;    /* Adds space between lines of text for readability */
 }
 
@@ -18,9 +20,9 @@ p {
     max-width: 320px;
     margin: 40px auto;
     padding: 24px;
-    border: 1px solid #ddd;
+    border: 1px solid #23305a;
     border-radius: 8px;
-    background: #fafafa;
+    background: #192040;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     display: flex;
     flex-direction: column;
@@ -30,8 +32,10 @@ p {
 .input-field {
     padding: 10px;
     font-size: 1rem;
-    border: 1px solid #bbb;
+    border: 1px solid #23305a;
     border-radius: 4px;
+    background: #10162a;
+    color: #f5f6fa;
 }
 
 .action-btn {
@@ -40,18 +44,18 @@ p {
     border: none;
     border-radius: 4px;
     background: #0078d4;
-    color: #fff;
+    color: #10162a;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .action-btn:hover {
-    background: #005fa3;
+    background: #48cae4;
 }
 
 .logo {
     display: block;
     margin: 0 auto 16px auto;
-    max-width: 120px;
+    max-width: 200px;
     height: auto;
 }
