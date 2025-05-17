@@ -2,15 +2,7 @@ console.log('Script loaded successfully! Ready to build!');
 
 
 //Firebase configuration
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAexmdZbQHchTeluN-DUcXrP20yzFFUzOQ",
   authDomain: "tradehive-669db.firebaseapp.com",
@@ -22,17 +14,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+const auth = firebase.auth();
 
 // Login with email and password
 document.getElementById('loginBtn').addEventListener('click', () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  signInWithEmailAndPassword(auth, email, password)
+  auth.signInWithEmailAndPassword(email, password)
     .then(() => {
-      alert('Login successful!');
+      window.location.href = "../dashboard/dashboard.html";
     })
     .catch((error) => {
       alert('Login failed: ' + error.message);
@@ -43,7 +35,7 @@ document.getElementById('loginBtn').addEventListener('click', () => {
 document.getElementById('signupBtn').addEventListener('click', () => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  createUserWithEmailAndPassword(auth, email, password)
+  auth.createUserWithEmailAndPassword(email, password)
     .then(() => {
       alert('Signup successful!');
     })
