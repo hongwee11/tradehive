@@ -48,3 +48,10 @@ p {
 .action-btn:hover {
     background: #005fa3;
 }
+
+.logo {
+    display: block;
+    margin: 0 auto 16px auto;
+    max-width: 120px;
+    height: auto;
+}

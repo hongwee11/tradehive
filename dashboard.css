@@ -1,0 +1,14 @@
+body {
+    font-family: sans-serif; /* Sets a common, easy-to-read font for the whole page */
+    margin: 20px;          /* Adds some space around the content so it doesn't touch the edges */
+}
+
+h1 {
+    color: #333;         /* Changes the color of the main heading to dark gray */
+    text-align: center;  /* Centers the heading text */
+}
+
+p {
+    color: #666;         /* Changes the color of paragraphs to a lighter gray */
+    line-height: 1.5;    /* Adds space between lines of text for readability */
+}
