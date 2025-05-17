@@ -7,12 +7,24 @@
     <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to Your Dashboard</h1>
-    </header>
-    <main>
-        <p>Testing out branches this is your dashboard. Add your widgets and content here.</p>
-    </main>
+    <div class="dashboard-layout">
+        <nav class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#profile">Profile</a></li>
+                <li><a href="#settings">Settings</a></li>
+                <li><a href="#logout">Logout</a></li>
+            </ul>
+        </nav>
+        <main class="dashboard-main">
+            <header>
+                <h1>Welcome to Your Dashboard</h1>
+            </header>
+            <p>Testing out branches this is your dashboard. Add your widgets and content here.</p>
+        </main>
+    </div>
+    <footer>
+        <p>&copy; 2023 TradeHive. All rights reserved.</p>
     <script src="dashboard.js" type="module"></script>
 </body>
 </html>
