@@ -85,3 +85,23 @@ header {
     padding: 32px 0 16px 0;
     text-align: center;
 }
+
+.sidebar-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 32px;
+    color: #00b4d8;
+    gap: 10px;
+}
+
+.brand-logo {
+    width: 64px;
+    height: auto;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 4px;
+}
