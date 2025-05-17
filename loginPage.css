@@ -10,11 +10,6 @@ h1 {
     text-align: center;  /* Centers the heading text */
 }
 
-p {
-    color: #b0b8d1;         /* Changes the color of paragraphs to a lighter gray */
-    line-height: 1.5;    /* Adds space between lines of text for readability */
-}
-
 /* Styles for the login form */
 .login-container {
     max-width: 320px;
@@ -56,6 +51,6 @@ p {
 .logo {
     display: block;
     margin: 0 auto 16px auto;
-    max-width: 200px;
+    max-width: 320px;
     height: auto;
 }
