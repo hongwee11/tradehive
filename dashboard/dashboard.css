@@ -101,3 +101,11 @@ header {
     height: auto;
     margin-bottom: 8px;
 }
+
+.widget {
+    background: #192040;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 24px;
+}
