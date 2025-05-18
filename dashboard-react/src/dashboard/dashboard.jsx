@@ -1,4 +1,3 @@
-import React from "react";
 import Sidebar from "./components/sidebar";
 // Import your widgets here, e.g.:
 // import PortfolioChart from "./components/PortfolioChart";

@@ -5,7 +5,7 @@ function Sidebar() {
     <nav className="sidebar">
       <div className="sidebar-logo">
         {/* Update the src path as needed for your logo */}
-        <img src="/Brand Without Words.png" alt="TradeHive Logo" className="brand-logo" />
+        <img src="/BWW.png" alt="TradeHive Logo" className="brand-logo" />
         TradeHive
       </div>
       <ul className="sidebar-nav">
