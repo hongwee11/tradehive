@@ -109,3 +109,19 @@ header {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin-bottom: 24px;
 }
+
+.portfolio-widget .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.portfolio-change {
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 8px;
+    min-width: 110px;
+    text-align: right;
+}
