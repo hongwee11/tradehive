@@ -88,12 +88,12 @@ header {
 
 .sidebar-logo {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 32px;
-    color: #00b4d8;
+    color: #c0c0c0;
     gap: 10px;
 }
 
@@ -101,7 +101,4 @@ header {
     width: 64px;
     height: auto;
     margin-bottom: 8px;
-    border-radius: 8px;
-    background: #fff;
-    padding: 4px;
 }
