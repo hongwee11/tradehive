@@ -16,7 +16,7 @@ function Dashboard() {
         {/* Add your widgets here */}
         {/* <PortfolioChart /> */}
         {/* <TopHoldings /> */}
-        <h1>Welcome to Your Dashboard Testing</h1>
+        <h1>Welcome to Your Dashboard</h1>
         <p>This is your dashboard main area.</p>
         <Chart title="Portfolio Value Over Time" data={tempData} labels={tempLabels} />
       </main>
