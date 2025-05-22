@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './loginPage.css';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAexmdZb0HchetLuN-DUcXrP29yzFFUzOQ",
-    authDomain: "tradehive-669db.firebaseapp.com",
-    projectId: "tradehive-669db",
-    storageBucket: "tradehive-669db.appspot.com",
-    messagingSenderId: "187487667012",
-    appId: "1:187487667012:web:4d2d2acc9d9c90551f4d11",
-    measurementId: "G-ZJN8NGJ5W"
-  };
+  apiKey: "AIzaSyAexmdZbQHchTeluN-DUcXrP20yzFFUzOQ",
+  authDomain: "tradehive-669db.firebaseapp.com",
+  projectId: "tradehive-669db",
+  storageBucket: "tradehive-669db.firebasestorage.app",
+  messagingSenderId: "187487667012",
+  appId: "1:187487667012:web:4d2d2acc9d9c90551f4d11",
+  measurementId: "G-ZJN18NGJ5W"
+};
   
 
 // Initialize Firebase
@@ -23,11 +24,12 @@ const auth = getAuth(app);
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        window.location.href = "/dashboard";
+        navigate('/dashboard');
       })
       .catch((error) => {
         alert('Login failed: ' + error.message);
