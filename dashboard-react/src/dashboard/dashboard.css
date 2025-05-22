@@ -6,7 +6,7 @@
 
 .dashboard-main {
   flex: 1;
-  padding: 32px 40px;
+  padding: 32px 0 32px 40px;
   background: transparent;
   color: #f5f6fa; /* or any color you want */
 }
