@@ -1,11 +1,9 @@
-import Dashboard from './dashboard/dashboard';
+import React from 'react';
+import LoginPage from './login/LoginPage';
 
 function App() {
-  return (
-    <>
-      <Dashboard />
-    </>
-  );
+  return <LoginPage />;
 }
 
 export default App;
+
