@@ -1,6 +1,15 @@
 import "./sidebar.css";
+import { useNavigate , Link } from 'react-router-dom';
+
+
 
 function Sidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+  navigate('/');
+};
+
   return (
     <nav className="sidebar">
       <div className="sidebar-logo">
@@ -9,10 +18,10 @@ function Sidebar() {
         TradeHive
       </div>
       <ul className="sidebar-nav">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#profile">Profile</a></li>
-        <li><a href="#settings">Settings</a></li>
-        <li><a href="#logout">Logout</a></li>
+        <li><Link to="#home">Home</Link></li>
+        <li><Link to="#profile">Profile</Link></li>
+        <li><Link to="#settings">Settings</Link></li>
+        <button onClick={handleLogout} className="logout-button">Logout</button>
       </ul>
     </nav>
   );
