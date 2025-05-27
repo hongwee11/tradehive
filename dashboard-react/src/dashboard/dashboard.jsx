@@ -2,7 +2,7 @@ import Sidebar from "./components/sidebar";
 import Chart from "./components/chart";
 
 
-// Import your widgets here, e.g.:
+// Import widgets here, e.g.:
 // import PortfolioChart from "./components/PortfolioChart";
 // import TopHoldings from "./components/TopHoldings";
 import "./dashboard.css";
@@ -16,9 +16,31 @@ function Dashboard() {
     <div className="dashboard-layout">
       <Sidebar />
       <main className="dashboard-main">
-        <h1>Welcome to Your Dashboard hello</h1>
-        <p>This is your dashboard main area.</p>
-        <Chart title="Portfolio Value Over Time" data={tempData} labels={tempLabels} />
+        {/* Top */}
+        <div className="dashboard-top-row">
+          <div className="widget widget-portfolio-value">Total Portfolio Value</div>
+          <div className="widget widget-gain-loss">Total Gain/Loss</div>
+          <div className="widget widget-daily-change">Day's Change</div>
+        </div>
+        
+        {/* Middle */}
+        <div className="dashboard-main-row">
+          <div className="dashboard-main-left">
+            <div className="widget widget-performance-chart">
+              <Chart title="Portfolio Value Over Time" data={tempData} labels={tempLabels} />
+          </div>
+        </div>
+        <div className="dashboard-main-right">
+            <div className="widget widget-recent-trades">
+              Recent Trades
+            </div>
+          </div>
+        </div>
+        
+        {/* Bottom */}
+        <div className="holdings">
+          Holding table
+        </div>
       </main>
     </div>
   );
