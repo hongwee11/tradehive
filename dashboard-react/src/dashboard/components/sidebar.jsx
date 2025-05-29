@@ -19,6 +19,7 @@ function Sidebar() {
       </div>
       <ul className="sidebar-nav">
         <li><Link to="#home">Home</Link></li>
+        <li><Link to="/trade">Add Trade</Link></li>
         <li><Link to="#profile">Profile</Link></li>
         <li><Link to="#settings">Settings</Link></li>
         <button onClick={handleLogout} className="logout-button">Logout</button>
