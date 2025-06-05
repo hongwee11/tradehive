@@ -1,5 +1,6 @@
 import Sidebar from "./components/sidebar";
 import Chart from "./components/chart";
+import PositionTable from "./components/PositionTable";
 
 
 // Import widgets here, e.g.:
@@ -39,7 +40,7 @@ function Dashboard() {
         
         {/* Bottom */}
         <div className="holdings">
-          Holding table
+          <PositionTable />
         </div>
       </main>
     </div>
