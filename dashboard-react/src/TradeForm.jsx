@@ -1,9 +1,10 @@
 // React state and lifecycle functions
 import { useState, useEffect } from "react";
-
+import "./TradeForm.css";
 // Firestore and Firebase Auth
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { db, auth } from "./firebase"; // your configured Firebase instance
+import Sidebar from "./dashboard/components/sidebar"; // adding the sidebar component
 
 // The TradeForm component lets a user input a trade and store it in Firestore
 const TradeForm = () => {
@@ -47,54 +48,57 @@ const TradeForm = () => {
 
   // The JSX returned is the UI of the form
   return (
-    <div style={{ padding: "2rem", color: "white" }}>
-      <h2>Add Trade</h2>
+    <div style={{ display: "flex" }}>
+      <Sidebar />
+      <div style={{ padding: "2rem", color: "white" }}>
+        <h2>Add Trade</h2>
 
-      {/* Trade Input Form */}
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        {/* Ticker Field */}
-        <input
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value)}
-          placeholder="Ticker"
-          required
-        />
+        {/* Trade Input Form */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {/* Ticker Field */}
+          <input
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            placeholder="Ticker"
+            required
+          />
 
-        {/* Action Dropdown */}
-        <select value={action} onChange={(e) => setAction(e.target.value)}>
-          <option value="BUY">BUY</option>
-          <option value="SELL">SELL</option>
-        </select>
+          {/* Action Dropdown */}
+          <select value={action} onChange={(e) => setAction(e.target.value)}>
+            <option value="BUY">BUY</option>
+            <option value="SELL">SELL</option>
+          </select>
 
-        {/* Quantity Input */}
-        <input
-          type="number"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          placeholder="Quantity"
-          required
-        />
+          {/* Quantity Input */}
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder="Quantity"
+            required
+          />
 
-        {/* Price Input */}
-        <input
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="Price"
-          required
-        />
+          {/* Price Input */}
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="Price"
+            required
+          />
 
-        {/* Date Picker */}
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
+          {/* Date Picker */}
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
 
-        {/* Submit Button */}
-        <button type="submit">Add Trade</button>
-      </form>
+          {/* Submit Button */}
+          <button type="submit">Add Trade</button>
+        </form>
+      </div>
     </div>
   );
 };
