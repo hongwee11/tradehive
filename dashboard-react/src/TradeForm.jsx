@@ -1,6 +1,5 @@
 // React state and lifecycle functions
 import { useState, useEffect } from "react";
-import "./TradeForm.css";
 // Firestore and Firebase Auth
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { db, auth } from "./firebase"; // your configured Firebase instance
