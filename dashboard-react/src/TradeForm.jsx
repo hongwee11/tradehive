@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 // Firestore and Firebase Auth
 import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { db, auth } from "../../firebase"; // your configured Firebase instance
+import { db, auth } from "./firebase"; // your configured Firebase instance
 
 // The TradeForm component lets a user input a trade and store it in Firestore
 const TradeForm = () => {

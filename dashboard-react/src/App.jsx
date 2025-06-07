@@ -1,7 +1,7 @@
 import React from 'react';
 import LoginPage from './loginpage/LoginPage'; 
 import Dashboard from './dashboard/dashboard';
-import TradeForm from './dashboard/components/TradeForm';
+import TradeForm from './TradeForm';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
