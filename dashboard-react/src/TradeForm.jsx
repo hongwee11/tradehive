@@ -61,67 +61,143 @@ const TradeForm = () => {
                             ]; // example of ticker autofills can use API to make it more comprehensive
   // The JSX returned is the UI of the form
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar />
-      <div style={{ padding: "2rem", color: "white" }}>
-        <h2>Add Trade</h2>
+  <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#0E0F23", color: "white" }}>
+    <Sidebar />
 
-        {/* Trade Input Form */}
+    <div style={{
+      flex: 1,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: "2rem"
+    }}>
+      <div style={{
+        backgroundColor: "#1E1F3B",
+        padding: "2.5rem",
+        borderRadius: "1rem",
+        width: "100%",
+        maxWidth: "400px",
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)"
+      }}>
+        <h2 style={{
+          textAlign: "center",
+          fontSize: "1.8rem",
+          marginBottom: "1.5rem"
+        }}>
+          Add Trade
+        </h2>
+
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {/* Ticker Field */}
           <input
             list="tickers"
             value={ticker}
-            onChange={(e) => setTicker(e.target.value.toUpperCase())} // convert to uppercase on change
+            onChange={(e) => setTicker(e.target.value.toUpperCase())}
             placeholder="Ticker"
             required
+            style={{
+              padding: "0.75rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#2A2C4D",
+              color: "white",
+              fontSize: "1rem"
+            }}
           />
-          <datalist id="tickers"> {/* suggestion to autofill the tickers*/}
+          <datalist id="tickers">
             {tickerSuggestions.map((t) => (
               <option key={t} value={t} />
             ))}
           </datalist>
 
-          {/* Action Dropdown only two options buy or sell*/} 
-          <select value={action} onChange={(e) => setAction(e.target.value)}>
+          <select
+            value={action}
+            onChange={(e) => setAction(e.target.value)}
+            style={{
+              padding: "0.75rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#2A2C4D",
+              color: "white",
+              fontSize: "1rem"
+            }}
+          >
             <option value="BUY">BUY</option>
             <option value="SELL">SELL</option>
           </select>
 
-          {/* Quantity Input */}
           <input
             type="number"
+            min={1}
+            step={1}
             value={quantity}
-            min={1} // minimum quantity is 1
-            step={1} // step of 1 for whole shares}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="Quantity"
             required
+            style={{
+              padding: "0.75rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#2A2C4D",
+              color: "white",
+              fontSize: "1rem"
+            }}
           />
 
-          {/* Price Input */}
           <input
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             placeholder="Price"
             required
+            style={{
+              padding: "0.75rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#2A2C4D",
+              color: "white",
+              fontSize: "1rem"
+            }}
           />
 
-          {/* Date Picker */}
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
+            style={{
+              padding: "0.75rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#2A2C4D",
+              color: "white",
+              fontSize: "1rem"
+            }}
           />
 
-          {/* Submit Button */}
-          <button type="submit">Add Trade</button>
+          <button
+            type="submit"
+            style={{
+              marginTop: "1rem",
+              padding: "0.75rem",
+              border: "none",
+              borderRadius: "0.5rem",
+              backgroundColor: "#3B82F6",
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              cursor: "pointer",
+              transition: "background-color 0.2s ease"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#2563EB"}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#3B82F6"}
+          >
+            Add Trade
+          </button>
         </form>
       </div>
     </div>
-  );
-};
+  </div>
+);};
+
 
 export default TradeForm;
