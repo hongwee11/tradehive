@@ -16,7 +16,7 @@ function Chart({ title, data, labels }) {
   
   const last = data[data.length - 1];
   const prev = data[data.length - 2];
-  const valueChange = last - prev;
+  const valueChange = (last - prev).toFixed(2); 
   const percentChange = ((valueChange / prev) * 100).toFixed(2);
   
   return (
