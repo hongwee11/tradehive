@@ -1,0 +1,89 @@
+/* General forum layout */
+.forum-home {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .forum-home h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .forum-home ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .forum-home li {
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  
+  .forum-home li:hover {
+    background: #eaeaea;
+  }
+  
+  .forum-home a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .forum-home a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Create Post Form */
+  form {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  form h2 {
+    margin-bottom: 20px;
+  }
+  
+  input[type="text"],
+  textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #45a049;
+  }
+  
+  /* Post Page Comments */
+  hr {
+    margin: 30px 0;
+  }
+  
+  ul li i {
+    color: #888;
+    font-style: italic;
+  }
+  
