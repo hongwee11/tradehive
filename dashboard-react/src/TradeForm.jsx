@@ -1,7 +1,7 @@
 // React state and lifecycle functions
 import { useState, useEffect } from "react";
 // Firestore and Firebase Auth
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "./firebase"; // your configured Firebase instance
 import Sidebar from "./dashboard/components/sidebar"; // adding the sidebar component
 
@@ -14,21 +14,69 @@ const TradeForm = () => {
   const [price, setPrice] = useState(""); // price per share
   const [date, setDate] = useState(""); // trade date
   const [user, setUser] = useState(null); // current Firebase user
+  const [userPositions, setUserPositions] = useState({}); // to store user's current positions
 
   // This runs once when the component loads, to detect if a user is logged in
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => {
-      if (u) setUser(u); // set user if logged in
-    });
-    return () => unsubscribe(); // clean up listener on unmount
-  }, []);
+    if (u) {
+      setUser(u);
+      fetchUserPositions();
+    }
+  });
+  return () => unsubscribe(); //
+}, []);
 
+//Fetch user positions
+ useEffect(() => {
+  if (user) {
+    fetchUserPositions();
+  }
+}, [user]);
+
+//Fetch user positions from Firestore
+const fetchUserPositions = async () => {
+  if (!user) return;
+  
+  const q = query(collection(db, "trades"), where("userId", "==", user.uid));
+  const snapshot = await getDocs(q);
+  
+  const positions = {};
+  snapshot.forEach(doc => {
+    const { ticker, action, quantity } = doc.data();
+    if (!positions[ticker]) positions[ticker] = 0;
+    
+    if (action === "BUY") {
+      positions[ticker] += quantity; // add quantity for BUY action
+    } else if (action === "SELL") {
+      positions[ticker] -= quantity; // subtract quantity for SELL action
+    }
+  });
+  
+  // Only keep positive positions
+  Object.keys(positions).forEach(ticker => {
+    if (positions[ticker] <= 0) delete positions[ticker];
+  });
+  
+  setUserPositions(positions); //update state with user positions
+};
   // This function handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // prevent the page from reloading on submit
 
     // If not logged in, don't allow submission
     if (!user) return alert("You must be logged in to add a trade.");
+
+    //Validation to see if user owns the stock before selling
+    if (action === "SELL") {
+    const currentPosition = userPositions[ticker.toUpperCase()] || 0; // get current position for the ticker, default to 0 if not found
+    if (currentPosition === 0) {
+      return alert(`You don't own any shares of ${ticker.toUpperCase()}.`); //alert if no shares owned
+    }
+    if (Number(quantity) > currentPosition) {
+      return alert(`You only own ${currentPosition} shares of ${ticker.toUpperCase()}. Cannot sell ${quantity} shares.`); //alert if not enough shares to sell
+    }
+  }
 
     // Add the trade to the "trades" collection in Firestore
     await addDoc(collection(db, "trades"), {
