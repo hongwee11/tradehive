@@ -65,6 +65,22 @@ const fetchUserPositions = async () => {
 
     // If not logged in, don't allow submission
     if (!user) return alert("You must be logged in to add a trade.");
+
+    if (!ticker.trim()) {
+    return alert("Please enter a ticker symbol.");
+  }
+  
+  if (!quantity || Number(quantity) <= 0) {
+    return alert("Please enter a valid quantity (greater than 0).");
+  }
+  
+  if (!price || Number(price) <= 0) {
+    return alert("Please enter a valid price (greater than 0).");
+  }
+  
+  if (!date) {
+    return alert("Please select a date for the trade.");
+  }
     
     //check if ticker is valid
     if (!tickerSuggestions.includes(ticker.toUpperCase())) {
