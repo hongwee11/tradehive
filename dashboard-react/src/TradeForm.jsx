@@ -9,7 +9,6 @@ import Sidebar from "./dashboard/components/sidebar"; // adding the sidebar comp
 const TradeForm = () => {
   // Local state for form inputs
   const [ticker, setTicker] = useState(""); // stock symbol (e.g., AAPL)
-  const [action, setAction] = useState("BUY"); // BUY or SELL
   const [quantity, setQuantity] = useState(""); // number of shares
   const [price, setPrice] = useState(""); // price per share
   const [date, setDate] = useState(""); // trade date
@@ -61,14 +60,19 @@ const fetchUserPositions = async () => {
   setUserPositions(positions); //update state with user positions
 };
   // This function handles form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, actionType) => {
     e.preventDefault(); // prevent the page from reloading on submit
 
     // If not logged in, don't allow submission
     if (!user) return alert("You must be logged in to add a trade.");
+    
+    //check if ticker is valid
+    if (!tickerSuggestions.includes(ticker.toUpperCase())) {
+    return alert(`"${ticker.toUpperCase()}" is not a valid ticker. Please select from the dropdown suggestions.`);
+    }
 
     //Validation to see if user owns the stock before selling
-    if (action === "SELL") {
+    if (actionType === "SELL") {
     const currentPosition = userPositions[ticker.toUpperCase()] || 0; // get current position for the ticker, default to 0 if not found
     if (currentPosition === 0) {
       return alert(`You don't own any shares of ${ticker.toUpperCase()}.`); //alert if no shares owned
@@ -81,7 +85,7 @@ const fetchUserPositions = async () => {
     // Add the trade to the "trades" collection in Firestore
     await addDoc(collection(db, "trades"), {
       ticker: ticker.toUpperCase(),       // ensure uppercase (e.g., AAPL)
-      action,                             // "BUY" or "SELL"
+      action: actionType,                             // "BUY" or "SELL"
       quantity: Number(quantity),         // convert string to number
       price: Number(price),               // convert string to number
       date: Timestamp.fromDate(new Date(date)), // convert input date to Firestore Timestamp
@@ -89,8 +93,8 @@ const fetchUserPositions = async () => {
     });
 
     // Show confirmation and reset the form
-    alert("Trade added!");
-    setTicker(""); setAction("BUY"); setQuantity(""); setPrice(""); setDate("");
+    alert(`${actionType} trade added!`);
+    setTicker(""); setQuantity(""); setPrice(""); setDate("");
   };
 
   const tickerSuggestions = ["AAPL", "ABBV", "ABNB", "ABT", "ACN", "ADBE", "AEP", "AIG", "AMD", "AMAT", 
@@ -105,8 +109,9 @@ const fetchUserPositions = async () => {
                             "ON", "PCAR", "PEP", "PFE", "PG", "PLTR", "PM", "PYPL", "QCOM", "REGN", 
                             "ROP", "ROST", "SHOP", "SCHW", "SNPS", "SBUX", "T", "TMUS", "TSLA", "TTWO", 
                             "TXN", "UNH", "UNP", "UPS", "USB", "V", "VZ", "WBD", "WDAY", "WFC", "WMT", 
-                            "XEL", "XOM", "ZS"
-                            ]; // example of ticker autofills can use API to make it more comprehensive
+                            "XEL", "XOM", "ZS","COIN", "DKNG", "F", "LCID", "RIVN", "ROKU", "SNAP", "SPOT", "SQ",
+                            "TWTR", "UBER", "UPST", "ZM", "ARKK", "QQQ", "SPY", "IWM", "DIA", "SQQQ"
+                            ]; // example of ticker autofills can use API to make it more comprehensive (but we dont have enough api calls to do that)
   // The JSX returned is the UI of the form
   return (
   <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#0E0F23", color: "white" }}>
@@ -135,7 +140,7 @@ const fetchUserPositions = async () => {
           Add Trade
         </h2>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <form style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <input
             list="tickers"
             value={ticker}
@@ -156,22 +161,6 @@ const fetchUserPositions = async () => {
               <option key={t} value={t} />
             ))}
           </datalist>
-
-          <select
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
-            style={{
-              padding: "0.75rem",
-              border: "none",
-              borderRadius: "0.5rem",
-              backgroundColor: "#2A2C4D",
-              color: "white",
-              fontSize: "1rem"
-            }}
-          >
-            <option value="BUY">BUY</option>
-            <option value="SELL">SELL</option>
-          </select>
 
           <input
             type="number"
@@ -222,25 +211,49 @@ const fetchUserPositions = async () => {
             }}
           />
 
-          <button
-            type="submit"
-            style={{
-              marginTop: "1rem",
-              padding: "0.75rem",
-              border: "none",
-              borderRadius: "0.5rem",
-              backgroundColor: "#3B82F6",
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "1rem",
-              cursor: "pointer",
-              transition: "background-color 0.2s ease"
-            }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#2563EB"}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#3B82F6"}
-          >
-            Add Trade
-          </button>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, "BUY")}
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                border: "none",
+                borderRadius: "0.5rem",
+                backgroundColor: "#00ff99",
+                color: "#22223b",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                cursor: "pointer",
+                transition: "background-color 0.2s ease"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#00cc7a"}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#00ff99"}
+            >
+              BUY
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => handleSubmit(e, "SELL")}
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                border: "none",
+                borderRadius: "0.5rem",
+                backgroundColor: "#ff4d4f",
+                color: "white",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                cursor: "pointer",
+                transition: "background-color 0.2s ease"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#d73027"}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#ff4d4f"}
+            >
+              SELL
+            </button>
+          </div>
         </form>
       </div>
     </div>
