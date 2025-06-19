@@ -1,89 +1,455 @@
 /* General forum layout */
+body {
+  background-color: #0b1120; /* Deep blue background */
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Using Inter for a modern look */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  line-height: 1.6; /* Improve readability */
+  color: #e0e0e0; /* Default text color for the body */
+}
+
+/* Wrapper for the entire forum content/create post/post detail page to position the top-left button */
+.forum-container-wrapper,
+.create-post-page-container {
+  position: relative;
+  min-height: 100vh;
+  padding-top: 80px; /* Increased padding for more space at the top for the button */
+  box-sizing: border-box;
+  display: flex; /* Use flexbox to center content */
+  flex-direction: column; /* Stack content vertically */
+  align-items: center; /* Center horizontally */
+  padding-bottom: 40px; /* Add some space at the bottom */
+  gap: 20px; /* Space between main card and comments card */
+}
+
+
+/* Container for the "Back to Home/Forum" button */
+.back-to-home-button-container {
+  position: absolute;
+  top: 30px; /* Slightly increased top distance */
+  left: 30px; /* Slightly increased left distance */
+  z-index: 1000;
+}
+
+/* Main Forum Content Area (for ForumHome.jsx) */
 .forum-home {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 0 20px;
-    font-family: Arial, sans-serif;
+  max-width: 900px;
+  width: 100%; /* Ensure it takes full width up to max-width */
+  margin: 0 auto;
+  padding: 30px;
+  color: #e0e0e0;
+  background-color: #1a202c;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid #2d3748;
+}
+
+/* Header Section (Title and Create Post Button for ForumHome.jsx) */
+.forum-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #4a5568;
+}
+
+.forum-header h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #63b3ed;
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styling (Home, Create Post, Submit - shared styles) */
+.home-button,
+.create-post-button,
+.submit-post-button {
+  background-color: #4299e1;
+  padding: 12px 20px;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  cursor: pointer;
+}
+
+.home-button:hover,
+.create-post-button:hover,
+.submit-post-button:hover {
+  background-color: #3182ce;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.home-button:active,
+.create-post-button:active,
+.submit-post-button:active {
+  transform: translateY(-1px);
+}
+
+/* Post List Styling (for ForumHome.jsx) */
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.post-item {
+  background-color: #2d3748;
+  color: #e0e0e0;
+  border-radius: 10px;
+  padding: 18px 25px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid #4a5568;
+}
+
+.post-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.post-item a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.post-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #a0aec0;
+  margin-bottom: 8px;
+}
+
+.post-author {
+  font-size: 15px;
+  color: #cbd5e0;
+  font-style: italic;
+}
+
+/* --- CREATE POST PAGE SPECIFIC STYLING --- */
+.create-post-card {
+  background-color: #1a202c; /* Same as forum-home background for consistency */
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid #2d3748;
+  padding: 30px;
+  max-width: 600px; /* Max width for the form card */
+  width: 100%; /* Ensure it takes full width up to max-width */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.create-post-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #63b3ed;
+  margin-bottom: 30px;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.create-post-form .form-group {
+  margin-bottom: 20px; /* Space between form groups */
+}
+
+.create-post-form .form-label {
+  display: block; /* Make label appear above input */
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #a0aec0; /* Lighter color for labels */
+}
+
+.create-post-form .form-input,
+.create-post-form .form-textarea {
+  width: 100%; /* Full width within its container */
+  padding: 12px 15px;
+  background-color: #2d3748; /* Darker input background */
+  border: 1px solid #4a5568; /* Subtle border */
+  border-radius: 8px;
+  font-size: 16px;
+  color: #e0e0e0;
+  box-sizing: border-box; /* Include padding and border in element's total width */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.create-post-form .form-input:focus,
+.create-post-form .form-textarea:focus {
+  outline: none; /* Remove default focus outline */
+  border-color: #63b3ed; /* Highlight border on focus */
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.5); /* Soft glow on focus */
+}
+
+.create-post-form .form-textarea {
+  resize: vertical; /* Allow vertical resizing only */
+  min-height: 100px; /* Minimum height for textarea */
+}
+
+.submit-post-button {
+  width: 100%; /* Make submit button full width */
+  margin-top: 30px; /* Space above the button */
+  display: block; /* Ensure button takes full width */
+  text-align: center; /* Center the text inside the button */
+}
+
+/* --- POST PAGE SPECIFIC STYLING --- */
+.post-detail-card {
+  max-width: 900px; /* Wider card for post content */
+  width: 100%;
+}
+
+.post-detail-title {
+  font-size: 38px; /* Larger title for single post */
+  font-weight: 700;
+  color: #63b3ed;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.post-detail-content {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #c0c0c0;
+  margin-bottom: 25px;
+  padding: 0 10px; /* Little horizontal padding */
+  white-space: pre-wrap; /* Preserve whitespace and line breaks */
+  word-wrap: break-word; /* Break long words */
+}
+
+.post-detail-author {
+  display: block;
+  font-size: 14px;
+  color: #909090;
+  text-align: right;
+  margin-top: -15px; /* Pull it slightly up towards content */
+  font-style: italic;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #4a5568;
+}
+
+.comments-section-card {
+  max-width: 900px; /* Match width of post-detail-card */
+  width: 100%;
+  margin-top: 20px; /* Space between post and comments */
+}
+
+.comments-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #63b3ed;
+  margin-bottom: 25px;
+  text-align: center;
+  border-bottom: 1px solid #4a5568;
+  padding-bottom: 10px;
+}
+
+.no-comments-message {
+  text-align: center;
+  color: #a0aec0;
+  font-style: italic;
+  padding: 20px 0;
+}
+
+.comments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comment-item {
+  background-color: #2d3748; /* Same as post-item */
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid #4a5568;
+}
+
+.comment-content {
+  font-size: 16px;
+  color: #e0e0e0;
+  margin-bottom: 5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.comment-author {
+  font-size: 13px;
+  color: #909090;
+  text-align: right;
+  display: block;
+  font-style: italic;
+}
+
+.comment-form {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #4a5568;
+}
+
+.comment-submit-button {
+  margin-top: 20px; /* Space above the comment submit button */
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .forum-container-wrapper,
+  .create-post-page-container {
+    padding-top: 70px;
+    padding-left: 15px;
+    padding-right: 15px;
+    gap: 15px; /* Adjust gap for smaller screens */
   }
-  
-  .forum-home h2 {
-    text-align: center;
+
+  .back-to-home-button-container {
+    top: 15px;
+    left: 15px;
+  }
+
+  .forum-home,
+  .create-post-card,
+  .post-detail-card,
+  .comments-section-card { /* Apply mobile padding to new cards */
+    padding: 20px;
+    margin: 0;
+    border-radius: 8px;
+  }
+
+  .forum-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 25px;
+  }
+
+  .forum-header h2,
+  .create-post-title,
+  .post-detail-title,
+  .comments-title { /* Adjust font size for all titles */
+    font-size: 28px;
     margin-bottom: 20px;
   }
-  
-  .forum-home ul {
-    list-style: none;
+
+  .create-post-button,
+  .submit-post-button {
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+  }
+
+  .home-button,
+  .create-post-button,
+  .submit-post-button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 20px;
+  }
+
+  .post-item {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+  }
+
+  .post-title {
+    font-size: 18px;
+  }
+
+  .post-author {
+    font-size: 14px;
+  }
+
+  .create-post-form .form-input,
+  .create-post-form .form-textarea {
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  .create-post-form .form-label {
+    font-size: 14px;
+  }
+
+  .post-detail-content {
+    font-size: 16px;
     padding: 0;
   }
-  
-  .forum-home li {
-    background: #f7f7f7;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    transition: background 0.2s;
+
+  .comment-item {
+    padding: 12px 15px;
+    margin-bottom: 12px;
   }
-  
-  .forum-home li:hover {
-    background: #eaeaea;
+
+  .comment-content {
+    font-size: 15px;
   }
-  
-  .forum-home a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  .forum-container-wrapper,
+  .create-post-page-container {
+    padding-top: 60px;
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 10px;
   }
-  
-  .forum-home a:hover {
-    text-decoration: underline;
+  .back-to-home-button-container {
+    top: 10px;
+    left: 10px;
   }
-  
-  /* Create Post Form */
-  form {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #fafafa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+  .home-button {
+    padding: 8px 12px;
+    font-size: 13px;
   }
-  
-  form h2 {
-    margin-bottom: 20px;
+  .forum-home,
+  .create-post-card,
+  .post-detail-card,
+  .comments-section-card {
+    padding: 15px;
   }
-  
-  input[type="text"],
-  textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+  .forum-header h2,
+  .create-post-title,
+  .post-detail-title,
+  .comments-title {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+  .create-post-button,
+  .submit-post-button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .post-item {
+    padding: 12px 15px;
+    margin-bottom: 12px;
+  }
+  .post-title {
     font-size: 16px;
   }
-  
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+  .post-author {
+    font-size: 13px;
   }
-  
-  button:hover {
-    background: #45a049;
+  .create-post-form .form-group {
+    margin-bottom: 15px;
   }
-  
-  /* Post Page Comments */
-  hr {
-    margin: 30px 0;
+  .create-post-form .form-input,
+  .create-post-form .form-textarea {
+    min-height: 80px;
   }
-  
-  ul li i {
-    color: #888;
-    font-style: italic;
+  .post-detail-content {
+    font-size: 15px;
   }
-  
+  .comment-content {
+    font-size: 14px;
+  }
+}

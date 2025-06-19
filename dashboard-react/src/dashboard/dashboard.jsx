@@ -1,163 +1,270 @@
+// Import core React features
 import React, { useState, useEffect } from "react";
+
+// Import custom components
 import Sidebar from "./components/sidebar";
 import Chart from "./components/chart";
 import PositionTable from "./components/PositionTable";
+
+// Import Firestore tools
 import { collection, query, where, getDocs } from "firebase/firestore";
+
+// Import Firebase configuration
 import { db, auth } from "../firebase";
+
+// Import styles
 import "./dashboard.css";
-//Processsing data for the chart in dashboard or chart itself?
+
+// Twelve Data API key for fetching stock prices
 const API_KEY = "a7775737d9d94745839febae0115d15a";
-//generate the last 7 dates
+
+// Utility function to get the past 7 days in YYYY-MM-DD format
 function getLast7Days() {
   const days = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    days.push(d.toISOString().slice(0, 10)); // Format: YYYY-MM-DD
+    days.push(d.toISOString().slice(0, 10));
   }
   return days;
 }
 
-
-
+// Main dashboard component
 function Dashboard() {
-  const [positions, setPositions] = useState([]); //what stocks the user has together with their quantities, avg prices, etc.
-  const [totalValue, setTotalValue] = useState(0); // total mkt value of all positions
-  const [totalPositions, setTotalPositions] = useState(0); //total cost basis of all positions
-  const [portfolioHistory, setPortfolioHistory] = useState([]);//portfolio value of the last 7 days
+  // State variables
+  const [positions, setPositions] = useState([]);              // Array of current stock positions
+  const [totalValue, setTotalValue] = useState(0);             // Total current market value
+  const [totalPositions, setTotalPositions] = useState(0);     // Total cost basis
+  const [portfolioHistory, setPortfolioHistory] = useState([]); // Historical portfolio values
+  const [loading, setLoading] = useState(true);                // Loading state
+  const [realizedPnL, setRealizedPnL] = useState(0);           // Realized profit and loss
 
+  // Fetch data when component mounts
   useEffect(() => {
-  async function fetchData() {
-    const user = auth.currentUser; //getting id of the user
-    if (!user) return;
-
-    // Fetch trades
-    const q = query(collection(db, "trades"), where("userId", "==", user.uid));
-    const snapshot = await getDocs(q);
-
-    // Prepare trades array with date as string
-    const trades = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      trades.push({
-        ...data, // copy all the data from the dataset
-        date: data.date?.toDate ? data.date.toDate().toISOString().slice(0, 10) : data.date //override date to string format 
-      });
-    });
-
-    const pos = {}; //creating a new object to hold positions
-    trades.forEach(({ ticker, action, quantity, price }) => { //looping through trades
-      if (!pos[ticker]) pos[ticker] = { ticker, quantity: 0, avgPrice: 0, totalCost: 0 }; // if ticker does not currently exist, create it with default values
-      if (action === "BUY") { // how to handle buy and sell actions
-        pos[ticker].totalCost += price * quantity;
-        pos[ticker].quantity += quantity;
-      } else if (action === "SELL") {
-        pos[ticker].quantity -= quantity;
+    async function fetchData() {
+      const user = auth.currentUser; // Get current user from Firebase Auth
+      if (!user) {
+        console.log("User not logged in. Cannot fetch data.");
+        setLoading(false);
+        return;
       }
-      pos[ticker].avgPrice = pos[ticker].quantity > 0 ? (pos[ticker].totalCost / pos[ticker].quantity) : 0;
-    });
 
-    let costBasis = 0; //total amount paid for all positions
-    for (const ticker of Object.keys(pos)) {
-      if (pos[ticker].quantity > 0) { //only allow longs so positions should be > 0
-        costBasis += pos[ticker].quantity * pos[ticker].avgPrice; // how to caluclate cost basis
-      }
-    }
-    setTotalPositions(costBasis); // set total positions to cost basis
+      setLoading(true); // Start loading
 
-    let total = 0; // finding the total market value of all positions
-    const positionsArr = [];
-    for (const ticker of Object.keys(pos)) {
-      if (pos[ticker].quantity <= 0) continue; // in case position < 0 which should not happen
-      let livePrice = 0;
       try {
-        const resp = await fetch(
-          `https://api.twelvedata.com/price?symbol=${ticker}&apikey=${API_KEY}` //retrieving live price of the stock from 12 data API
+        // 1. Get all trades for the logged-in user
+        const q = query(collection(db, "trades"), where("userId", "==", user.uid));
+        const snapshot = await getDocs(q);
+
+        const trades = [];
+        // Normalize and collect trades
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          trades.push({
+            ...data,
+            date: data.date?.toDate ? data.date.toDate().toISOString().slice(0, 10) : data.date
+          });
+        });
+
+        // Sort trades by date (ascending)
+        trades.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // 2. Calculate current holdings and realized P&L
+        const pos = {}; // Object to track each stock's position
+        let totalRealizedPnL = 0; // Total realized P&L
+
+        trades.forEach(({ ticker, action, quantity, price }) => {
+          if (!pos[ticker]) {
+            pos[ticker] = { ticker, quantity: 0, totalInvested: 0 };
+          }
+
+          if (action === "BUY") {
+            pos[ticker].totalInvested += price * quantity;
+            pos[ticker].quantity += quantity;
+          } else if (action === "SELL") {
+            if (pos[ticker].quantity > 0) {
+              const avgCost = pos[ticker].totalInvested / pos[ticker].quantity;
+              const qtyToSell = Math.min(quantity, pos[ticker].quantity);
+
+              const gainLoss = (price - avgCost) * qtyToSell;
+              totalRealizedPnL += gainLoss;
+
+              pos[ticker].totalInvested -= avgCost * qtyToSell;
+              pos[ticker].quantity -= qtyToSell;
+
+              if (pos[ticker].quantity === 0) {
+                pos[ticker].totalInvested = 0;
+              }
+            } else {
+              console.warn(`Invalid sell: ${ticker}, qty: ${quantity}`);
+            }
+          }
+
+          // Update average price
+          pos[ticker].avgPrice = pos[ticker].quantity > 0
+            ? pos[ticker].totalInvested / pos[ticker].quantity
+            : 0;
+        });
+
+        // Save realized P&L to state
+        setRealizedPnL(totalRealizedPnL);
+
+        // 3. Calculate total cost basis of current holdings
+        let totalCostBasis = 0;
+        for (const ticker in pos) {
+          if (pos[ticker].quantity > 0) {
+            totalCostBasis += pos[ticker].totalInvested;
+          }
+        }
+        setTotalPositions(totalCostBasis);
+
+        // 4. Fetch live prices and calculate market value
+        let marketValue = 0;
+        const positionsArr = [];
+        const activeTickers = Object.keys(pos).filter(t => pos[t].quantity > 0);
+
+        await Promise.all(
+          activeTickers.map(async (ticker) => {
+            let livePrice = 0;
+            try {
+              const resp = await fetch(`https://api.twelvedata.com/price?symbol=${ticker}&apikey=${API_KEY}`);
+              const data = await resp.json();
+              livePrice = parseFloat(data.price) || 0;
+            } catch (e) {
+              console.error(`Price error: ${ticker}`, e);
+            }
+
+            const value = livePrice * pos[ticker].quantity;
+            marketValue += value;
+
+            positionsArr.push({
+              ...pos[ticker],
+              livePrice,
+              marketValue: value,
+              gainLoss: value - pos[ticker].totalInvested
+            });
+          })
         );
-        const data = await resp.json(); //wait for http response
-        livePrice = parseFloat(data.price) || 0; // parse the price, if it fails then it is 0
-      } catch (e) {}
-      const marketValue = livePrice * pos[ticker].quantity; // how to calculate market value of the position
-      total += marketValue; // add to total market value
-      positionsArr.push({
-        ...pos[ticker],
-        livePrice,
-        marketValue,
-      }); // push the position to the array
-    }
-    setPositions(positionsArr); // set positions to the array of positions
-    setTotalValue(total); // set total value to the total market value
 
-    // Calculate portfolio value for last 7 days
-    const last7Days = getLast7Days(); // generate the dates of the last 7 days using method defined above
-    const tickers = Array.from(new Set(trades.map(t => t.ticker))); //determine unique tickers from trades
-    const priceMap = {}; // create a map to hold prices for each ticker
-    for (const ticker of tickers) {
-      const resp = await fetch(
-        `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=7&apikey=${API_KEY}` // fetch historical prices for each ticker
-      );
-      const data = await resp.json();
-      priceMap[ticker] = data.values ? data.values.reverse() : [];
-    }
+        setPositions(positionsArr);       // Set stock positions
+        setTotalValue(marketValue);       // Set total market value
 
-    const history = []; // array to hold portfolio value for each of the last 7 days
-    for (let i = 0; i < last7Days.length; i++) { //for loop to faciliate this
-      const date = last7Days[i];
-      // Calculate positions as of this date
-      const positionsForDay = {}; // object to hold positions for each date
-      trades.forEach(trade => { //loop through trades
-        if (trade.date <= date) {
-          if (!positionsForDay[trade.ticker]) positionsForDay[trade.ticker] = 0; // if ticker does not exist, create it
-          positionsForDay[trade.ticker] += trade.action === "BUY" ? trade.quantity : -trade.quantity; // add or subtract quantity based on action
+        // 5. Get historical value for the last 7 days
+        const last7Days = getLast7Days();
+        const uniqueTickers = Array.from(new Set(trades.map(t => t.ticker)));
+
+        const priceMap = {};
+        await Promise.all(
+          uniqueTickers.map(async (ticker) => {
+            try {
+              const resp = await fetch(`https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1day&outputsize=7&apikey=${API_KEY}`);
+              const data = await resp.json();
+              priceMap[ticker] = data.values ? data.values.reverse() : [];
+            } catch (e) {
+              console.error(`History price error: ${ticker}`, e);
+              priceMap[ticker] = [];
+            }
+          })
+        );
+
+        const historyValues = [];
+
+        // Compute portfolio value for each of the past 7 days
+        for (let i = 0; i < last7Days.length; i++) {
+          const date = last7Days[i];
+          const snapshotPositions = {};
+
+          // Simulate positions as of that day
+          const tradesUntilDate = trades.filter(trade => trade.date <= date);
+          tradesUntilDate.forEach(trade => {
+            if (!snapshotPositions[trade.ticker]) {
+              snapshotPositions[trade.ticker] = { quantity: 0, totalInvested: 0 };
+            }
+
+            if (trade.action === "BUY") {
+              snapshotPositions[trade.ticker].quantity += trade.quantity;
+              snapshotPositions[trade.ticker].totalInvested += trade.price * trade.quantity;
+            } else if (trade.action === "SELL") {
+              if (snapshotPositions[trade.ticker].quantity > 0) {
+                const avgPrice = snapshotPositions[trade.ticker].totalInvested / snapshotPositions[trade.ticker].quantity;
+                const qtyToSell = Math.min(trade.quantity, snapshotPositions[trade.ticker].quantity);
+                snapshotPositions[trade.ticker].totalInvested -= avgPrice * qtyToSell;
+                snapshotPositions[trade.ticker].quantity -= qtyToSell;
+                if (snapshotPositions[trade.ticker].quantity === 0) {
+                  snapshotPositions[trade.ticker].totalInvested = 0;
+                }
+              }
+            }
+          });
+
+          // Add up value for the day using historical close prices
+          let dayValue = 0;
+          for (const ticker of uniqueTickers) {
+            const priceEntry = priceMap[ticker] ? priceMap[ticker][i] : undefined;
+            if (snapshotPositions[ticker] && snapshotPositions[ticker].quantity > 0 && priceEntry) {
+              dayValue += snapshotPositions[ticker].quantity * parseFloat(priceEntry.close);
+            }
+          }
+
+          historyValues.push(dayValue);
         }
-      });
-      // Calculate value for this date
-      let dayTotal = 0; //starting value for the day
-      for (const ticker of tickers) {
-        const priceEntry = priceMap[ticker][i]; // get the price entry for the ticker on this date
-        if (positionsForDay[ticker] > 0 && priceEntry) {
-          dayTotal += positionsForDay[ticker] * parseFloat(priceEntry.close); // calculate the total value for the day by multiplying quantity by price
-        }
+
+        setPortfolioHistory(historyValues); // Set 7-day portfolio history
+
+      } catch (error) {
+        console.error("Data fetch error:", error);
+      } finally {
+        setLoading(false); // Finish loading
       }
-      history.push(dayTotal); // push the total value for the day to the history array
     }
-    setPortfolioHistory(history); // set portfolio history to the history array
-  }
 
-  fetchData();
+    fetchData(); // Trigger data load
   }, []);
 
+  // Show loading screen while fetching data
+  if (loading) {
+    return (
+      <div className="dashboard-layout" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>
+        <h2>Loading Portfolio Data...</h2>
+      </div>
+    );
+  }
+
+  // Prepare chart labels and gain/loss numbers
   const tempLabels = getLast7Days();
-  const daysChange = portfolioHistory[portfolioHistory.length - 1] - portfolioHistory[portfolioHistory.length - 2];
+  const daysChange = portfolioHistory.length >= 2
+    ? (portfolioHistory[portfolioHistory.length - 1] - portfolioHistory[portfolioHistory.length - 2])
+    : 0;
   const gainLoss = totalValue - totalPositions;
 
+  // Dashboard UI
   return (
     <div className="dashboard-layout">
       <Sidebar />
       <main className="dashboard-main">
-        {/* Top */}
+        {/* Top widgets showing key portfolio stats */}
         <div className="dashboard-top-row">
           <div className="widget widget-portfolio-value">Your Portfolio Value: ${totalValue.toFixed(2)}</div>
-          <div className="widget widget-gain-loss">Total Gain/Loss: ${gainLoss.toFixed(2)} </div>
-          <div className="widget widget-daily-change">Day's Change: ${daysChange.toFixed(2)}
-          </div>
+          <div className="widget widget-gain-loss">Total Gain/Loss: ${gainLoss.toFixed(2)}</div>
+          <div className="widget widget-daily-change">Day's Change: ${daysChange.toFixed(2)}</div>
+          <div className="widget widget-realized-pnl">Realized P&L: ${realizedPnL.toFixed(2)}</div>
         </div>
-        
-        {/* Middle */}
+
+        {/* Middle row: chart and recent trades */}
         <div className="dashboard-main-row">
           <div className="dashboard-main-left">
             <div className="widget widget-performance-chart">
               <Chart title="Portfolio Value Over Time" data={portfolioHistory} labels={tempLabels} />
+            </div>
           </div>
-        </div>
-        <div className="dashboard-main-right">
+          <div className="dashboard-main-right">
             <div className="widget widget-recent-trades">
               Recent Trades
             </div>
           </div>
         </div>
-        
-        {/* Bottom */}
+
+        {/* Bottom row: holdings table */}
         <div className="holdings">
           <PositionTable positions={positions} />
         </div>
@@ -166,5 +273,5 @@ function Dashboard() {
   );
 }
 
-
+// Export dashboard for use in router/app
 export default Dashboard;
