@@ -118,6 +118,8 @@ const TradeForm = () => {
     "XEL", "XOM", "ZS", "COIN", "DKNG", "F", "LCID", "RIVN", "ROKU", "SNAP", "SPOT", "SQ",
     "TWTR", "UBER", "UPST", "ZM", "ARKK", "QQQ", "SPY", "IWM", "DIA", "SQQQ"
   ]; // example of ticker autofills can use API to make it more comprehensive (but we dont have enough api calls to do that)
+  
+  const todayStr = new Date().toISOString().split("T")[0]; //get today's date
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#0E0F23", color: "white" }}>
@@ -205,6 +207,7 @@ const TradeForm = () => {
             <input
               type="date"
               value={date}
+              max={todayStr} // restrict to today or earlier
               onChange={(e) => setDate(e.target.value)}
               required
               style={{
