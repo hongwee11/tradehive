@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./components/sidebar";
 import Chart from "./components/chart";
 import PositionTable from "./components/PositionTable";
+import TradeHistory from "./components/tradehistory";
 
 // Import Firestore tools
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -259,7 +260,7 @@ function Dashboard() {
           </div>
           <div className="dashboard-main-right">
             <div className="widget widget-recent-trades">
-              Recent Trades
+              <TradeHistory />
             </div>
           </div>
         </div>
