@@ -1,5 +1,5 @@
 // React Router hook to access route parameters (e.g., post ID)
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 // Firestore functions for retrieving and adding data
 import { doc, getDoc, collection, addDoc, query, where, getDocs, Timestamp } from "firebase/firestore";
@@ -9,6 +9,8 @@ import { db, auth } from "../firebase";
 
 // React hooks for state and effect
 import { useEffect, useState } from "react";
+
+import './forum.css'; // Import custom CSS for styling
 
 // Component to display a single post and its comments
 function PostPage() {
@@ -60,41 +62,67 @@ function PostPage() {
   };
 
   // Component UI
-  return (
-    <div>
+  // Component UI
+return (
+  <div className="forum-container-wrapper">
+    {/* Back button that links to the forum homepage - using same styling as CreatePost */}
+    <div className="back-to-home-button-container">
+      <Link className="home-button" to="/forum">
+        Back to Forum
+      </Link>
+    </div>
+
+    {/* Post Detail Card */}
+    <div className="post-detail-card">
+      <h1 className="post-detail-title">Post Details</h1>
+      
+      {/* Display loading message if post is not yet loaded */}
+      {!post && <p>Loading post...</p>}
+      
       {/* Render post if it has been loaded */}
       {post && (
         <>
-          <h2>{post.title}</h2> {/* Post title */}
-          <p>{post.content}</p> {/* Post content */}
-          <small>Posted by: {post.userEmail}</small> {/* Author info */}
+          <h2>{post.title}</h2>
+          <p className="post-detail-content">{post.content}</p>
+          <small className="post-detail-author">Posted by: {post.userEmail}</small>
         </>
       )}
+    </div>
 
-      <hr />
-
-      {/* Comments Section */}
-      <h3>Comments</h3>
-      <ul>
-        {comments.map((c, i) => (
-          <li key={i}>
-            {c.content} — <i>{c.userEmail}</i> {/* Comment content and user */}
-          </li>
-        ))}
-      </ul>
+    {/* Comments Section Card */}
+    <div className="comments-section-card">
+      <h3 className="comments-title">Comments</h3>
+      
+      {comments.length === 0 ? (
+        <p className="no-comments-message">No comments yet. Be the first to comment!</p>
+      ) : (
+        <ul className="comments-list">
+          {comments.map((c, i) => (
+            <li key={i} className="comment-item">
+              <div className="comment-content">{c.content}</div>
+              <small className="comment-author">— {c.userEmail}</small>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Form to submit new comment */}
-      <form onSubmit={handleComment}>
+      <form onSubmit={handleComment} className="comment-form">
         <textarea
           value={comment}
-          onChange={e => setComment(e.target.value)} // Update comment state as user types
+          onChange={e => setComment(e.target.value)}
           placeholder="Write a comment..."
+          className="form-textarea"
+          rows="4"
           required
         />
-        <button type="submit">Comment</button>
+        <button type="submit" className="submit-post-button comment-submit-button">
+          Comment
+        </button>
       </form>
     </div>
-  );
+  </div>
+);
 }
 
 // Export the component so it can be used in routes
