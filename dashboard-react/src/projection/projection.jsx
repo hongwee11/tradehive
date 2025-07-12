@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import Sidebar from '../dashboard/components/sidebar';
 import './projection.css';
 
+const allowedTickers = ["AAPL", "ABBV", "ABNB", "ABT", "ACN", "ADBE", "AEP", "AIG", "AMD", "AMAT",
+    "AMGN", "AMT", "AMZN", "APP", "ARM", "ASML", "AVGO", "AXP", "BA", "BAC",
+    "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CHTR", "CL",
+    "CMCSA", "COF", "COP", "COST", "CRM", "CSCO", "CVS", "CVX", "CDNS", "CDW",
+    "DE", "DHR", "DIS", "DUK", "EMR", "FDX", "GD", "GE", "GILD", "GM",
+    "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "INTU", "ISRG", "JNJ",
+    "JPM", "KO", "LIN", "LLY", "LMT", "LOW", "MA", "MAR", "MCD", "MDT",
+    "MET", "MDLZ", "MELI", "META", "MMM", "MO", "MRK", "MRVL", "MSTR", "MS",
+    "MSFT", "MU", "NFLX", "NEE", "NKE", "NOW", "NVDA", "NXPI", "ORLY", "ODFL",
+    "ON", "PCAR", "PEP", "PFE", "PG", "PLTR", "PM", "PYPL", "QCOM", "REGN",
+    "ROP", "ROST", "SHOP", "SCHW", "SNPS", "SBUX", "T", "TMUS", "TSLA", "TTWO",
+    "TXN", "UNH", "UNP", "UPS", "USB", "V", "VZ", "WBD", "WDAY", "WFC", "WMT",
+    "XEL", "XOM", "ZS", "COIN", "DKNG", "F", "LCID", "RIVN", "ROKU", "SNAP", "SPOT", "SQ",
+    "TWTR", "UBER", "UPST", "ZM", "ARKK", "QQQ", "SPY", "IWM", "DIA", "SQQQ"];
+
 function ProjectionsPage() {
   // Current earnings data (static for now)
   const currentEarnings = {
@@ -9,11 +24,13 @@ function ProjectionsPage() {
     pe: 4.11,
     epsGrowth: 31.5
   };
-
+  const [ticker, setTicker] = useState('');
   const [epsTTM, setEpsTTM] = useState('');
   const [epsGrowthRate, setEpsGrowthRate] = useState('');
   const [epsMultiple, setEpsMultiple] = useState('');
   const [desiredReturn, setDesiredReturn] = useState('');
+
+
 
 
   return (
@@ -22,6 +39,24 @@ function ProjectionsPage() {
       
       <main className="projections-main">
         <h1 className="projections-title">Stock Projections</h1>
+        
+        <div className="ticker-input-container">
+          <div className="ticker-input-card">
+            <label className="ticker-label">Enter Stock Ticker Symbol</label>
+            <div className="ticker-input-group">
+              <input 
+                type="text" 
+                value={ticker}
+                onChange={(e) => setTicker(e.target.value.toUpperCase())}
+                className="ticker-input"
+                placeholder="e.g., AAPL, MSFT, TSLA"
+              />
+              <button className="fetch-data-button">
+                Fetch Live Data
+              </button>
+            </div>
+          </div>
+        </div>
         
         <div className="projections-container">
           {/* Left Column - Assumptions */}
