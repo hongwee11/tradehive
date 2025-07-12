@@ -71,7 +71,6 @@
   margin-bottom: 1rem;
 }
 
-/* Current Earnings Section */
 .current-earnings-section {
   margin-bottom: 2rem;
 }
@@ -104,7 +103,6 @@
   color: #63b3ed;
 }
 
-/* Calculation Results */
 .calculation-results {
   margin-bottom: 2rem;
 }
@@ -139,7 +137,6 @@
   color: #00ff99;
 }
 
-/* Chart Placeholder */
 .chart-placeholder {
   background: #2d3748;
   border-radius: 8px;
@@ -152,7 +149,6 @@
   justify-content: center;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .projections-container {
     grid-template-columns: 1fr;
@@ -177,4 +173,57 @@
   .projections-title {
     font-size: 2rem;
   }
+}
+
+.inputs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.projection-input {
+  padding: 0.75rem;
+  background: #2d3748;
+  border: 1px solid #4a5568;
+  border-radius: 6px;
+  color: #f5f6fa;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.projection-input:focus {
+  outline: none;
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  right: 0.75rem;
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.input-help {
+  font-size: 0.85rem;
+  color: #718096;
+  line-height: 1.4;
 }
