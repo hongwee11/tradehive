@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PostPage from './forum/PostPage';
 import ForumHome from './forum/ForumHome';
 import CreatePost from './forum/CreatePost';
+import ProjectionsPage from './projection/projection';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/trade" element={<TradeForm />} />
         <Route path="/forum" element={<ForumHome />} />
+        <Route path="/projection" element={<ProjectionsPage />} />
         <Route path="/forum/post/:id" element={<PostPage />} />
         <Route path="/forum/create" element={<CreatePost />} />
       </Routes>
