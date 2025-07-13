@@ -32,7 +32,7 @@ function ForumHome() {
     // Call the fetch function
     fetchPosts();
   }, []); // Empty dependency array = run only on first render
-
+  
   // Component UI
   return (
     <div className="forum-container-wrapper"> {/* Wrapper for the whole page layout */}

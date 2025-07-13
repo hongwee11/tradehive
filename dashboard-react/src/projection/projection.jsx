@@ -2,33 +2,14 @@ import React, { useState } from 'react';
 import Sidebar from '../dashboard/components/sidebar';
 import './projection.css';
 
-const allowedTickers = ["AAPL", "ABBV", "ABNB", "ABT", "ACN", "ADBE", "AEP", "AIG", "AMD", "AMAT",
-    "AMGN", "AMT", "AMZN", "APP", "ARM", "ASML", "AVGO", "AXP", "BA", "BAC",
-    "BIIB", "BK", "BKNG", "BLK", "BMY", "BRK.B", "C", "CAT", "CHTR", "CL",
-    "CMCSA", "COF", "COP", "COST", "CRM", "CSCO", "CVS", "CVX", "CDNS", "CDW",
-    "DE", "DHR", "DIS", "DUK", "EMR", "FDX", "GD", "GE", "GILD", "GM",
-    "GOOG", "GOOGL", "GS", "HD", "HON", "IBM", "INTC", "INTU", "ISRG", "JNJ",
-    "JPM", "KO", "LIN", "LLY", "LMT", "LOW", "MA", "MAR", "MCD", "MDT",
-    "MET", "MDLZ", "MELI", "META", "MMM", "MO", "MRK", "MRVL", "MSTR", "MS",
-    "MSFT", "MU", "NFLX", "NEE", "NKE", "NOW", "NVDA", "NXPI", "ORLY", "ODFL",
-    "ON", "PCAR", "PEP", "PFE", "PG", "PLTR", "PM", "PYPL", "QCOM", "REGN",
-    "ROP", "ROST", "SHOP", "SCHW", "SNPS", "SBUX", "T", "TMUS", "TSLA", "TTWO",
-    "TXN", "UNH", "UNP", "UPS", "USB", "V", "VZ", "WBD", "WDAY", "WFC", "WMT",
-    "XEL", "XOM", "ZS", "COIN", "DKNG", "F", "LCID", "RIVN", "ROKU", "SNAP", "SPOT", "SQ",
-    "TWTR", "UBER", "UPST", "ZM", "ARKK", "QQQ", "SPY", "IWM", "DIA", "SQQQ"];
-
 function ProjectionsPage() {
   // Current earnings data (static for now)
-  const currentEarnings = {
-    eps: 20.92,
-    pe: 4.11,
-    epsGrowth: 31.5
-  };
-  const [ticker, setTicker] = useState('');
   const [epsTTM, setEpsTTM] = useState('');
+  const [peTTM, setPeTTM] = useState('');
   const [epsGrowthRate, setEpsGrowthRate] = useState('');
   const [epsMultiple, setEpsMultiple] = useState('');
   const [desiredReturn, setDesiredReturn] = useState('');
+  const [currPrice, setCurrPrice] = useState('');
 
 
 
@@ -39,78 +20,62 @@ function ProjectionsPage() {
       
       <main className="projections-main">
         <h1 className="projections-title">Stock Projections</h1>
-        
-        <div className="ticker-input-container">
-          <div className="ticker-input-card">
-            <label className="ticker-label">Enter Stock Ticker Symbol</label>
-            <div className="ticker-input-group">
-              <input 
-                type="text" 
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value.toUpperCase())}
-                className="ticker-input"
-                placeholder="e.g., AAPL, MSFT, TSLA"
-              />
-              <button className="fetch-data-button">
-                Fetch Live Data
-              </button>
-            </div>
-          </div>
-        </div>
-        
         <div className="projections-container">
           {/* Left Column - Assumptions */}
           <div className="assumptions-column">
             <div className="assumptions-card">
-              <h2 className="section-title">Assumptions</h2>
               
               {/* Current Earnings Section */}
               <div className="current-earnings-section">
-                <h3 className="subsection-title">Current Earnings</h3>
+                <h3 className="subsection-title">Current Data</h3>
                 
                 <div className="earnings-grid">
                   <div className="earnings-item">
                     <span className="earnings-label">EPS (TTM)</span>
-                    <span className="earnings-value">${currentEarnings.eps}</span>
+                    <input
+                      type="number"
+                      value={epsTTM}
+                      onChange={(e) => setEpsTTM(e.target.value)}
+                      className="projection-input"
+                      placeholder="Enter EPS"
+                    />
                   </div>
                   
                   <div className="earnings-item">
                     <span className="earnings-label">P/E TTM</span>
-                    <span className="earnings-value">{currentEarnings.pe}</span>
+                    <input
+                      type="number"
+                      value={peTTM}
+                      onChange={(e) => setPeTTM(e.target.value)}
+                      className="projection-input"
+                      placeholder="Enter P/E"
+                    />
                   </div>
                   
                   <div className="earnings-item">
-                    <span className="earnings-label">EPS Growth</span>
-                    <span className="earnings-value">{currentEarnings.epsGrowth}%</span>
+                    <span className="earnings-label">Current Price</span>
+                    <input
+                      type="dollar"
+                      value={currPrice}
+                      onChange={(e) => setCurrPrice(e.target.value)}
+                      className="projection-input"
+                      placeholder="Enter current price"
+                    />
                   </div>
                 </div>
               </div>
+            <h3 className="subsection-title">Assumptions</h3>
 
               <div className="inputs-section">
                 <div className="input-group">
-                  <label className="input-label">EPS (TTM)</label>
+                  <label className="input-label">EPS Growth Rate</label>
                   <input 
                     type="number" 
-                    value={epsTTM}
-                    onChange={(e) => setEpsTTM(e.target.value)}
+                    value={epsGrowthRate}
+                    onChange={(e) => setEpsGrowthRate(e.target.value)}
                     className="projection-input"
                     placeholder="Enter EPS"
                   />
-                  <small className="input-help">The Earnings Per Share over the last 12 months</small>
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">EPS Growth Rate</label>
-                  <div className="input-with-icon">
-                    <input 
-                      type="number" 
-                      value={epsGrowthRate}
-                      onChange={(e) => setEpsGrowthRate(e.target.value)}
-                      className="projection-input"
-                      placeholder="Enter growth rate"
-                    />
-                    <span className="input-icon">%</span>
-                  </div>
                   <small className="input-help">Your assumption of the company's expected yearly EPS growth rate over the next 5 years</small>
                 </div>
 
