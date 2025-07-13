@@ -4,16 +4,14 @@ import './projection.css';
 
 function ProjectionsPage() {
   // Current earnings data (static for now)
-  const currentEarnings = {
-    eps: 20.92,
-    pe: 4.11,
-    epsGrowth: 31.5
-  };
-
   const [epsTTM, setEpsTTM] = useState('');
+  const [peTTM, setPeTTM] = useState('');
   const [epsGrowthRate, setEpsGrowthRate] = useState('');
   const [epsMultiple, setEpsMultiple] = useState('');
   const [desiredReturn, setDesiredReturn] = useState('');
+  const [currPrice, setCurrPrice] = useState('');
+
+
 
 
   return (
@@ -22,60 +20,62 @@ function ProjectionsPage() {
       
       <main className="projections-main">
         <h1 className="projections-title">Stock Projections</h1>
-        
         <div className="projections-container">
           {/* Left Column - Assumptions */}
           <div className="assumptions-column">
             <div className="assumptions-card">
-              <h2 className="section-title">Assumptions</h2>
               
               {/* Current Earnings Section */}
               <div className="current-earnings-section">
-                <h3 className="subsection-title">Current Earnings</h3>
+                <h3 className="subsection-title">Current Data</h3>
                 
                 <div className="earnings-grid">
                   <div className="earnings-item">
                     <span className="earnings-label">EPS (TTM)</span>
-                    <span className="earnings-value">${currentEarnings.eps}</span>
+                    <input
+                      type="number"
+                      value={epsTTM}
+                      onChange={(e) => setEpsTTM(e.target.value)}
+                      className="projection-input"
+                      placeholder="Enter EPS"
+                    />
                   </div>
                   
                   <div className="earnings-item">
                     <span className="earnings-label">P/E TTM</span>
-                    <span className="earnings-value">{currentEarnings.pe}</span>
+                    <input
+                      type="number"
+                      value={peTTM}
+                      onChange={(e) => setPeTTM(e.target.value)}
+                      className="projection-input"
+                      placeholder="Enter P/E"
+                    />
                   </div>
                   
                   <div className="earnings-item">
-                    <span className="earnings-label">EPS Growth</span>
-                    <span className="earnings-value">{currentEarnings.epsGrowth}%</span>
+                    <span className="earnings-label">Current Price</span>
+                    <input
+                      type="dollar"
+                      value={currPrice}
+                      onChange={(e) => setCurrPrice(e.target.value)}
+                      className="projection-input"
+                      placeholder="Enter current price"
+                    />
                   </div>
                 </div>
               </div>
+            <h3 className="subsection-title">Assumptions</h3>
 
               <div className="inputs-section">
                 <div className="input-group">
-                  <label className="input-label">EPS (TTM)</label>
+                  <label className="input-label">EPS Growth Rate</label>
                   <input 
                     type="number" 
-                    value={epsTTM}
-                    onChange={(e) => setEpsTTM(e.target.value)}
+                    value={epsGrowthRate}
+                    onChange={(e) => setEpsGrowthRate(e.target.value)}
                     className="projection-input"
                     placeholder="Enter EPS"
                   />
-                  <small className="input-help">The Earnings Per Share over the last 12 months</small>
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">EPS Growth Rate</label>
-                  <div className="input-with-icon">
-                    <input 
-                      type="number" 
-                      value={epsGrowthRate}
-                      onChange={(e) => setEpsGrowthRate(e.target.value)}
-                      className="projection-input"
-                      placeholder="Enter growth rate"
-                    />
-                    <span className="input-icon">%</span>
-                  </div>
                   <small className="input-help">Your assumption of the company's expected yearly EPS growth rate over the next 5 years</small>
                 </div>
 
