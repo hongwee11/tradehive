@@ -294,7 +294,7 @@ function FriendManagement() {
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-gray-400">You don't have any friends yet. Find some!</p>
+                    <p className="text-gray-400">You don't have any friends yet. Find some!</p> //show message if no friends
                 )}
             </div>
         </div>
