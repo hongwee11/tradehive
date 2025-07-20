@@ -20,6 +20,7 @@ function Sidebar() {
         <li><Link to="/dashboard">Home</Link></li>
         <li><Link to="/trade">Add Trade</Link></li>
         <li><Link to="/forum">Forum</Link></li>
+        <li><Link to="/leaderboard">Leaderboard</Link></li>
         <button onClick={handleLogout} className="logout-button">Logout</button>
       </ul>
     </nav>

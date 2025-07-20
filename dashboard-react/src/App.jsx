@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PostPage from './forum/PostPage';
 import ForumHome from './forum/ForumHome';
 import CreatePost from './forum/CreatePost';
+import Leaderboard from './leaderboard/Leaderboard';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/forum" element={<ForumHome />} />
         <Route path="/forum/post/:id" element={<PostPage />} />
         <Route path="/forum/create" element={<CreatePost />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
     </Router>
   );

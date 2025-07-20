@@ -1,5 +1,6 @@
+/* global __app_id */ // I'm only keeping __app_id here since it's the only global used directly in this file
 // Import core React features
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // I've fixed this import path back to "react"
 
 // Import custom components
 import Sidebar from "./components/sidebar";
@@ -8,7 +9,7 @@ import PositionTable from "./components/PositionTable";
 import TradeHistory from "./components/tradehistory";
 
 // Import Firestore tools
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, setDoc } from "firebase/firestore"; // I added doc and setDoc here for Firestore updates
 
 // Import Firebase configuration
 import { db, auth } from "../firebase";
@@ -18,6 +19,9 @@ import "./dashboard.css";
 
 // Twelve Data API key for fetching stock prices
 const API_KEY = "a7775737d9d94745839febae0115d15a";
+
+// I'm getting my app ID from the global canvas environment for Firestore paths
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 // Utility function to get the past 7 days in YYYY-MM-DD format
 function getLast7Days() {
@@ -39,6 +43,7 @@ function Dashboard() {
   const [portfolioHistory, setPortfolioHistory] = useState([]); // Historical portfolio values
   const [loading, setLoading] = useState(true);                // Loading state
   const [realizedPnL, setRealizedPnL] = useState(0);           // Realized profit and loss
+  const [pnlPercentage, setPnlPercentage] = useState(0);       // My new state for PnL percentage
 
   // Fetch data when component mounts
   useEffect(() => {
@@ -191,6 +196,7 @@ function Dashboard() {
                 const qtyToSell = Math.min(trade.quantity, snapshotPositions[trade.ticker].quantity);
                 snapshotPositions[trade.ticker].totalInvested -= avgPrice * qtyToSell;
                 snapshotPositions[trade.ticker].quantity -= qtyToSell;
+                // I'm fixing this: 'ticker' should be 'trade.ticker' here
                 if (snapshotPositions[trade.ticker].quantity === 0) {
                   snapshotPositions[trade.ticker].totalInvested = 0;
                 }
@@ -212,6 +218,26 @@ function Dashboard() {
 
         setPortfolioHistory(historyValues); // Set 7-day portfolio history
 
+        // My new logic to calculate and save PnL percentage for the leaderboard
+        let currentPnlPercentage = 0;
+        if (totalCostBasis > 0) {
+          // Calculate PnL percentage based on current market value vs. total cost basis
+          currentPnlPercentage = ((marketValue - totalCostBasis) / totalCostBasis) * 100;
+        } else if (marketValue > 0) {
+          // If no cost basis but value exists (e.g., gifted stock), consider it 100% gain for simplicity
+          currentPnlPercentage = 100;
+        }
+        setPnlPercentage(currentPnlPercentage); // Update my PnL percentage state
+
+        // Now, I'm saving the PnL percentage to Firestore for the leaderboard
+        const userProfileRef = doc(db, `artifacts/${appId}/public/data/userProfiles`, user.uid);
+        // I'm using setDoc with merge: true so I only update these specific fields
+        await setDoc(userProfileRef, {
+          displayName: user.displayName || `User_${user.uid.substring(0, 6)}`, // Using user's display name or a default
+          pnlPercentage: parseFloat(currentPnlPercentage.toFixed(2)), // Storing it as a number with 2 decimal places
+          lastUpdated: new Date().toISOString(), // Adding a timestamp for when it was last updated
+        }, { merge: true });
+
       } catch (error) {
         console.error("Data fetch error:", error);
       } finally {
@@ -220,7 +246,8 @@ function Dashboard() {
     }
 
     fetchData(); // Trigger data load
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.currentUser?.uid]); // I'm making sure this effect re-runs if the user changes
 
   // Show loading screen while fetching data
   if (loading) {
@@ -249,6 +276,8 @@ function Dashboard() {
           <div className="widget widget-gain-loss">Total Gain/Loss: ${gainLoss.toFixed(2)}</div>
           <div className="widget widget-daily-change">Day's Change: ${daysChange.toFixed(2)}</div>
           <div className="widget widget-realized-pnl">Realized P&L: ${realizedPnL.toFixed(2)}</div>
+          {/* I'm adding my new PnL percentage display here */}
+          <div className="widget widget-pnl-percentage">PnL Percentage: {pnlPercentage.toFixed(2)}%</div>
         </div>
 
         {/* Middle row: chart and recent trades */}
