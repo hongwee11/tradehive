@@ -1,181 +1,166 @@
-// React hooks for state and lifecycle
-import React, { useState, useEffect, useCallback } from 'react';
+/* global __app_id */ // I'm keeping __app_id here as it's used for the Firestore path
+import React, { useEffect, useState } from 'react';
+// because Firebase should only be initialized once in the entire application (e.g., in ../firebase.js).
+import { onAuthStateChanged } from 'firebase/auth'; // Only need onAuthStateChanged from auth
+import { collection, onSnapshot } from 'firebase/firestore'; // Only need collection and onSnapshot from firestore
 
-// Firebase authentication and callable functions
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { auth } from '../firebase'; // Your configured Firebase instance
+import { db, auth } from '../firebase'; // This is where Firebase is initialized once, and we import it here
 
-// Initialize Firebase Functions instance
-const functions = getFunctions();
+// Global variable for the Canvas environment's app ID, used for Firestore paths
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-// Reference to the backend Cloud Function `getFriendLeaderboard`
-const getFriendLeaderboardCallable = httpsCallable(functions, 'getFriendLeaderboard');
+// Leaderboard component
+const Leaderboard = () => {
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
 
-function Leaderboard() {
-    // State variables
-    const [leaderboardData, setLeaderboardData] = useState([]); // Stores leaderboard entries
-    const [loading, setLoading] = useState(true);                // Tracks loading state
-    const [error, setError] = useState(null);                    // Stores any error messages
-    const [timeframe, setTimeframe] = useState('all_time');      // Selected timeframe for leaderboard
-    const [currentUserId, setCurrentUserId] = useState(null);    // Stores logged-in user's ID
+  // Effect for Firebase authentication and setting up auth state listener
+  // Now using the 'auth' instance imported from '../firebase'
+  useEffect(() => {
+    // No need to call signInAnonymously or signInWithCustomToken here.
+    // The main Firebase setup (e.g., in App.js or a top-level component)
+    // should handle initial authentication if needed.
+    // This useEffect will just listen for auth state changes.
 
-    // Handle Firebase authentication and store current user's ID
-    useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setCurrentUserId(user.uid); // Save user ID if logged in
-            } else {
-                setCurrentUserId(null); // Clear user ID if logged out
-                alert("Please log in to view the leaderboard."); // Prompt login
-                setLoading(false);
-            }
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+        setIsAuthReady(true);
+        console.log("User authenticated:", user.uid);
+      } else {
+        setUserId(null);
+        setIsAuthReady(true); // Still set to true even if no user, means auth check is done
+        console.log("No user authenticated or authentication pending.");
+      }
+    });
+
+    return () => unsubscribeAuth(); // Cleanup auth listener on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth]); // Depend on 'auth' instance
+
+  // Effect for fetching leaderboard data once authentication is ready
+  useEffect(() => {
+    if (!isAuthReady) {
+      return; // Wait until authentication state is determined
+    }
+
+    setLoading(true);
+    setError(null);
+
+    // Define the collection path for public user profiles
+    const userProfilesCollectionRef = collection(db, `artifacts/${appId}/public/data/userProfiles`);
+
+    // Set up a real-time listener for user profiles
+    const unsubscribe = onSnapshot(userProfilesCollectionRef, (snapshot) => {
+      const users = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        users.push({
+          id: doc.id,
+          displayName: data.displayName || 'Anonymous User',
+          pnlPercentage: data.pnlPercentage !== undefined ? data.pnlPercentage : 0,
+          // Add other relevant fields if needed, e.g., lastUpdated: data.lastUpdated
         });
-        return () => unsubscribeAuth(); // Cleanup listener on unmount
-    }, []);
+      });
 
-    // Fetch leaderboard data from Firebase Function
-    const fetchLeaderboard = useCallback(async () => {
-        if (!currentUserId) {
-            setError("User not authenticated.");
-            setLoading(false);
-            return;
-        }
+      // Sort users by PnL percentage in descending order
+      users.sort((a, b) => b.pnlPercentage - a.pnlPercentage);
+      setLeaderboardData(users);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching leaderboard data:", err);
+      setError("Failed to load leaderboard data.");
+      setLoading(false);
+    });
 
-        setLoading(true);
-        setError(null);
-        try {
-            const result = await getFriendLeaderboardCallable({ timeframe }); // Pass selected timeframe
-            if (result.data.success) {
-                setLeaderboardData(result.data.leaderboard); // Update leaderboard state
-            } else {
-                // Handle unsuccessful response
-                const msg = result.data.message || "Failed to fetch leaderboard.";
-                setError(msg);
-                alert(msg);
-            }
-        } catch (err) {
-            // Handle function call error
-            console.error("Error calling getFriendLeaderboard:", err);
-            setError(`Error fetching leaderboard: ${err.message}`);
-            alert(`Error fetching leaderboard: ${err.message}`);
-        } finally {
-            setLoading(false);
-        }
-    }, [currentUserId, timeframe]);
+    return () => unsubscribe(); // Cleanup listener on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthReady, db, appId]); // Depend on 'isAuthReady', 'db', and 'appId'
 
-    // Re-fetch leaderboard when user or timeframe changes
-    useEffect(() => {
-        if (currentUserId) {
-            fetchLeaderboard();
-        }
-    }, [currentUserId, timeframe, fetchLeaderboard]);
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 font-inter flex flex-col items-center">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+          body { font-family: 'Inter', sans-serif; }
+        `}
+      </style>
 
-    // Handle timeframe button clicks
-    const handleTimeframeChange = (newTimeframe) => {
-        setTimeframe(newTimeframe);
-    };
+      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg p-6 mt-8">
+        <h1 className="text-4xl font-bold text-center text-blue-400 mb-8 tracking-wide">
+          <span className="inline-block mr-2">🏆</span> Leaderboard <span className="inline-block ml-2">🏆</span>
+        </h1>
 
-    return (
-        <div className="p-6 bg-gray-900 min-h-screen text-white font-inter rounded-lg shadow-lg">
-            <h2 className="text-3xl font-bold mb-6 text-center text-blue-400">Friend Leaderboard</h2>
+        {loading && (
+          <div className="text-center text-blue-300 text-lg">Loading leaderboard...</div>
+        )}
 
-            {/* Timeframe selection buttons */}
-            <div className="flex justify-center mb-6 space-x-4 flex-wrap">
-                <button
-                    onClick={() => handleTimeframeChange('all_time')}
-                    className={`px-5 py-2 rounded-md font-semibold transition duration-300 ease-in-out ${
-                        timeframe === 'all_time' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                >
-                    All Time
-                </button>
-                <button
-                    onClick={() => handleTimeframeChange('yearly')}
-                    className={`px-5 py-2 rounded-md font-semibold transition duration-300 ease-in-out ${
-                        timeframe === 'yearly' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                >
-                    This Year
-                </button>
-                <button
-                    onClick={() => handleTimeframeChange('monthly')}
-                    className={`px-5 py-2 rounded-md font-semibold transition duration-300 ease-in-out ${
-                        timeframe === 'monthly' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                >
-                    Last 30 Days
-                </button>
-                <button
-                    onClick={() => handleTimeframeChange('weekly')}
-                    className={`px-5 py-2 rounded-md font-semibold transition duration-300 ease-in-out ${
-                        timeframe === 'weekly' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                >
-                    Last 7 Days
-                </button>
-            </div>
+        {error && (
+          <div className="text-center text-red-400 text-lg p-4 bg-red-900 rounded-lg">
+            Error: {error}
+          </div>
+        )}
 
-            {/* Display loading message */}
-            {loading && (
-                <div className="text-center text-blue-400 text-lg">Loading leaderboard...</div>
-            )}
+        {userId && (
+          <div className="text-center text-sm text-gray-400 mb-4">
+            Your User ID: <span className="font-mono text-blue-300">{userId}</span>
+          </div>
+        )}
 
-            {/* Display error message */}
-            {error && (
-                <div className="text-center text-red-500 text-lg">{error}</div>
-            )}
+        {!loading && !error && leaderboardData.length === 0 && (
+          <div className="text-center text-gray-400 text-lg">No data available. Start trading to see results!</div>
+        )}
 
-            {/* No data fallback message */}
-            {!loading && !error && leaderboardData.length === 0 && (
-                <div className="text-center text-gray-400 text-lg">
-                    No leaderboard data available. Start trading or add friends!
-                </div>
-            )}
-
-            {/* Display leaderboard table */}
-            {!loading && !error && leaderboardData.length > 0 && (
-                <div className="overflow-x-auto rounded-lg shadow-md">
-                    <table className="min-w-full bg-gray-800 rounded-lg">
-                        <thead>
-                            <tr className="bg-gray-700 text-gray-300 uppercase text-sm leading-normal">
-                                <th className="py-3 px-6 text-left">Rank</th>
-                                <th className="py-3 px-6 text-left">Trader</th>
-                                <th className="py-3 px-6 text-right">PnL %</th>
-                                <th className="py-3 px-6 text-right">Realized PnL</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-gray-200 text-sm font-light">
-                            {leaderboardData.map((entry, index) => (
-                                <tr key={entry.userId} className="border-b border-gray-700 hover:bg-gray-700 transition duration-200 ease-in-out">
-                                    {/* Display rank */}
-                                    <td className="py-3 px-6 text-left whitespace-nowrap">
-                                        <span className="font-bold text-blue-300">{index + 1}</span>
-                                    </td>
-                                    {/* Display trader name and "(You)" if it's the logged-in user */}
-                                    <td className="py-3 px-6 text-left">
-                                        {entry.displayName} {entry.userId === currentUserId && "(You)"}
-                                    </td>
-                                    {/* Display PnL % with green/red color based on performance */}
-                                    <td className="py-3 px-6 text-right">
-                                        <span className={`${entry.pnlPercentage >= 0 ? 'text-green-400' : 'text-red-400'} font-semibold`}>
-                                            {entry.pnlPercentage.toFixed(2)}%
-                                        </span>
-                                    </td>
-                                    {/* Display realized PnL value */}
-                                    <td className="py-3 px-6 text-right">
-                                        <span className={`${entry.totalRealizedPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            ${entry.totalRealizedPnL.toFixed(2)}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </div>
-    );
-}
+        {!loading && !error && leaderboardData.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden">
+              <thead>
+                <tr className="bg-blue-600 text-white uppercase text-sm leading-normal">
+                  <th className="py-3 px-6 text-left rounded-tl-lg">Rank</th>
+                  <th className="py-3 px-6 text-left">Player Name</th>
+                  <th className="py-3 px-6 text-right rounded-tr-lg">PnL %</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-200 text-sm font-light">
+                {leaderboardData.map((user, index) => (
+                  <tr
+                    key={user.id}
+                    className={`border-b border-gray-600 hover:bg-gray-600 transition-colors duration-200
+                      ${index === 0 ? 'bg-yellow-700 bg-opacity-30' : ''}
+                      ${index === 1 ? 'bg-gray-500 bg-opacity-30' : ''}
+                      ${index === 2 ? 'bg-orange-700 bg-opacity-30' : ''}
+                    `}
+                  >
+                    <td className="py-3 px-6 text-left whitespace-nowrap">
+                      <div className="flex items-center">
+                        <span className="font-medium text-lg mr-2">
+                          {index === 0 && '🥇'}
+                          {index === 1 && '🥈'} 
+                          {index === 2 && '🥉'}
+                          {index >= 3 && `${index + 1}`}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-6 text-left">
+                      <span className="font-medium">{user.displayName}</span>
+                    </td>
+                    <td className="py-3 px-6 text-right">
+                      <span className={`font-bold text-lg ${user.pnlPercentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {user.pnlPercentage.toFixed(2)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default Leaderboard;
