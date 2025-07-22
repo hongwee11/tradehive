@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../dashboard/components/sidebar';
+import Chart from '../dashboard/components/chart';
 import './projection.css';
 
 function ProjectionsPage() {
@@ -17,15 +18,17 @@ function ProjectionsPage() {
     const currentPrice = parseFloat(currPrice) || 0;
     const desiredRet = parseFloat(desiredReturn) || 15;
 
-    if (!eps || !growthRate || !multiple || !currentPrice) {
+    if (eps <= 0 || growthRate < 0 || multiple <= 0 || currentPrice <= 0) {
       return {
         futureEPS: 0,
         targetPrice: 0,
         annualReturn: 0,
-        entryPrice: 0
+        entryPrice: 0,
+        chartData: [],
+        chartLabels: []
       };
     }
-
+    // 1. Calculate future EPS after 5 years
     const futureEPS = eps * Math.pow(1 + growthRate / 100, 5);
     
     // 2. Calculate target price
@@ -37,11 +40,29 @@ function ProjectionsPage() {
     // 4. Calculate entry price for desired return
     const entryPrice = targetPrice / Math.pow(1 + desiredRet / 100, 5);
 
+    //data for chart
+    const chartData = [];
+    const chartLabels = [];
+    const currentYear = new Date().getFullYear();
+
+    chartData.push(eps * multiple);
+    chartLabels.push(`${currentYear} (Current)`);
+
+    // Calculate projected prices for years 1-5
+    for (let year = 1; year <= 5; year++) {
+      const yearlyEPS = eps * Math.pow(1 + growthRate / 100, year);
+      const yearlyPrice = yearlyEPS * multiple;
+      chartData.push(parseFloat(yearlyPrice.toFixed(2)));
+      chartLabels.push(`${currentYear + year}`);
+    }
+
     return {
       futureEPS: futureEPS.toFixed(2),
       targetPrice: targetPrice.toFixed(2),
       annualReturn: annualReturn.toFixed(1),
-      entryPrice: entryPrice.toFixed(2)
+      entryPrice: entryPrice.toFixed(2),
+      chartData,
+      chartLabels
     };
   };
 
@@ -173,7 +194,17 @@ function ProjectionsPage() {
 
               {/* Chart Placeholder */}
               <div className="chart-placeholder">
-                <p>Chart will go here</p>
+                {projections.chartData.length > 0 ? (
+                <Chart 
+                  title="5-Year Price Projection"
+                  data={projections.chartData}
+                  labels={projections.chartLabels}
+                />
+              ) : (
+                <div className="chart-placeholder">
+                  <p>Enter values to see projection chart</p>
+                </div>
+              )}
               </div>
             </div>
           </div>
