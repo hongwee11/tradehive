@@ -73,8 +73,15 @@ function Dashboard() {
         });
 
         // Sort trades by date (ascending)
-        trades.sort((a, b) => new Date(a.date) - new Date(b.date));
+        trades.sort((a, b) => {
+          const dateCompare = new Date(a.date) - new Date(b.date);
+          if (dateCompare !== 0) return dateCompare;
 
+          //sort dates by buy/sell (for the bug fix)
+          if (a.action === "BUY" && b.action === "SELL") return -1; // BUY comes before SELL
+          if (a.action === "SELL" && b.action === "BUY") return 1; // SELL comes after BUY
+          return 0;
+        });
         // 2. Calculate current holdings and realized P&L
         const pos = {}; // Object to track each stock's position
         let totalRealizedPnL = 0; // Total realized P&L
