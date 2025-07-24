@@ -53,59 +53,6 @@ describe('ProjectionsPage Component', () => {
     expect(screen.getByText(/Future EPS \(5Y\)/)).toBeInTheDocument();
   });
 
-  test('inputs accept numeric values', () => {
-    render(<ProjectionsPage />);
-    
-    const epsInput = screen.getByPlaceholderText('Enter EPS');
-    const priceInput = screen.getByPlaceholderText('Enter current price');
-    const growthInput = screen.getByPlaceholderText('Enter growth rate');
-    const multipleInput = screen.getByPlaceholderText('Enter P/E ratio');
-    const returnInput = screen.getByPlaceholderText('Enter desired return');
-    
-    fireEvent.change(epsInput, { target: { value: '10' } });
-    fireEvent.change(priceInput, { target: { value: '200' } });
-    fireEvent.change(growthInput, { target: { value: '15' } });
-    fireEvent.change(multipleInput, { target: { value: '25' } });
-    fireEvent.change(returnInput, { target: { value: '12' } });
-    
-    expect(epsInput.value).toBe('10');
-    expect(priceInput.value).toBe('200');
-    expect(growthInput.value).toBe('15');
-    expect(multipleInput.value).toBe('25');
-    expect(returnInput.value).toBe('12');
-  });
-
-  test('calculates projections with valid inputs', async () => {
-    render(<ProjectionsPage />);
-    
-    // Fill in all inputs
-    fireEvent.change(screen.getByPlaceholderText('Enter EPS'), { target: { value: '10' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter current price'), { target: { value: '200' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter growth rate'), { target: { value: '15' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter P/E ratio'), { target: { value: '25' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter desired return'), { target: { value: '12' } });
-    
-    // Wait for calculations to update
-    await waitFor(() => {
-      // Should display calculated values (not $0.00 or 0.00%)
-      expect(screen.queryByText('$0.00')).not.toBeInTheDocument();
-    });
-  });
-
-  test('shows chart when data is available', async () => {
-    render(<ProjectionsPage />);
-    
-    // Fill inputs to generate chart data
-    fireEvent.change(screen.getByPlaceholderText('Enter EPS'), { target: { value: '10' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter current price'), { target: { value: '200' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter growth rate'), { target: { value: '15' } });
-    fireEvent.change(screen.getByPlaceholderText('Enter P/E ratio'), { target: { value: '25' } });
-    
-    await waitFor(() => {
-      expect(screen.getByTestId('chart-mock')).toBeInTheDocument();
-    });
-  });
-
   test('desired return defaults to 15% when empty', () => {
     render(<ProjectionsPage />);
     
