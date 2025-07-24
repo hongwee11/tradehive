@@ -1,4 +1,4 @@
-// src/dashboard/Dashboard.test.jsx
+// src/tests/dashboard.test.jsx
 
 // Import necessary testing utilities from React Testing Library
 import { render, screen, waitFor } from '@testing-library/react';
@@ -6,7 +6,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Import the Dashboard component that we want to test
-import Dashboard from './Dashboard';
+import Dashboard from '../dashboard/dashboard';
 
 // --- Mocking Dependencies ---
 // Jest's mocking allows us to control the behavior of modules
@@ -18,19 +18,19 @@ jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   query: jest.fn(),
   where: jest.fn(),
-  getDocs: jest.fn(() => Promise.resolve({ // Mock getDocs to return an empty snapshot by default
-    forEach: jest.fn(), // Mock forEach to do nothing for an empty snapshot
+  getDocs: jest.fn(() => Promise.resolve({
+    forEach: jest.fn(),
   })),
   doc: jest.fn(),
-  setDoc: jest.fn(() => Promise.resolve()), // Mock setDoc to resolve immediately
+  setDoc: jest.fn(() => Promise.resolve()),
 }));
 
 // Mock Firebase authentication and database instances
 // We'll mock 'db' and 'auth' from '../firebase'
 jest.mock('../firebase', () => ({
-  db: {}, // Mock db object, not used directly in this component's rendering logic
+  db: {},
   auth: {
-    currentUser: { // Mock a logged-in user by default
+    currentUser: {
       uid: 'test-user-id',
       displayName: 'Test User',
     },
@@ -39,22 +39,25 @@ jest.mock('../firebase', () => ({
 
 // Mock child components to prevent their internal logic from affecting Dashboard tests
 // This allows us to test if Dashboard *renders* them, without testing their individual behavior.
-jest.mock('./components/sidebar', () => {
+jest.mock('../dashboard/components/sidebar', () => {
   return function MockSidebar() {
     return <div data-testid="sidebar-mock">Sidebar Mock</div>;
   };
 });
-jest.mock('./components/chart', () => {
+
+jest.mock('../dashboard/components/chart', () => {
   return function MockChart(props) {
     return <div data-testid="chart-mock">Chart Mock - {props.title}</div>;
   };
 });
-jest.mock('./components/PositionTable', () => {
+
+jest.mock('../dashboard/components/PositionTable', () => {
   return function MockPositionTable(props) {
     return <div data-testid="position-table-mock">PositionTable Mock</div>;
   };
 });
-jest.mock('./components/tradehistory', () => {
+
+jest.mock('../dashboard/components/tradehistory', () => {
   return function MockTradeHistory() {
     return <div data-testid="trade-history-mock">TradeHistory Mock</div>;
   };
@@ -63,7 +66,7 @@ jest.mock('./components/tradehistory', () => {
 // Mock the global fetch API, as your component makes external API calls
 global.fetch = jest.fn(() =>
   Promise.resolve({
-    json: () => Promise.resolve({ price: '100.00', values: [] }), // Default mock response for price and time_series
+    json: () => Promise.resolve({ price: '100.00', values: [] }),
   })
 );
 
@@ -134,7 +137,7 @@ describe('Dashboard Component', () => {
   test('displays initial zero values for financial metrics', async () => {
     // Ensure getDocs returns no trades for this test
     require('firebase/firestore').getDocs.mockImplementation(() => Promise.resolve({
-      forEach: jest.fn(), // No trades means forEach does nothing
+      forEach: jest.fn(),
     }));
     // Ensure fetch returns default price 0 for calculation
     global.fetch.mockImplementation(() =>
