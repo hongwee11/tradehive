@@ -74,6 +74,11 @@ const TradeForm = () => {
     if (!date) {
       return alert("Please select a date for the trade.");
     }
+    //make sure that the user cannot enter a future date
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (date > todayStr) {
+      return alert("Trade date cannot be in the future.");
+    }
 
     if (!tickerSuggestions.includes(ticker.toUpperCase())) {
       return alert(`"${ticker.toUpperCase()}" is not a valid ticker. Please select from the dropdown suggestions.`);
