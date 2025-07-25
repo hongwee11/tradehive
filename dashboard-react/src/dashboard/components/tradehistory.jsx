@@ -2,7 +2,6 @@ import "./tradehistory.css";
 import React, { useEffect, useState } from "react";
 import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import { db, auth } from "../../firebase";
-import "./tradehistory.css";
 
 const TradeHistory = () => {
   const [trades, setTrades] = useState([]);
