@@ -197,7 +197,7 @@ const TradeForm = () => {
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="Price"
+              placeholder="Price Per Share"
               required
               style={{
                 padding: "0.75rem",
