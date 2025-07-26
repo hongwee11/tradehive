@@ -77,11 +77,12 @@ function Dashboard() {
           const dateCompare = new Date(a.date) - new Date(b.date);
           if (dateCompare !== 0) return dateCompare;
 
-          //sort dates by buy/sell (for the bug fix)
+          // Sort dates by buy/sell (for the bug fix)
           if (a.action === "BUY" && b.action === "SELL") return -1; // BUY comes before SELL
           if (a.action === "SELL" && b.action === "BUY") return 1; // SELL comes after BUY
           return 0;
         });
+
         // 2. Calculate current holdings and realized P&L
         const pos = {}; // Object to track each stock's position
         let totalRealizedPnL = 0; // Total realized P&L
@@ -203,7 +204,6 @@ function Dashboard() {
                 const qtyToSell = Math.min(trade.quantity, snapshotPositions[trade.ticker].quantity);
                 snapshotPositions[trade.ticker].totalInvested -= avgPrice * qtyToSell;
                 snapshotPositions[trade.ticker].quantity -= qtyToSell;
-                // I'm fixing this: 'ticker' should be 'trade.ticker' here
                 if (snapshotPositions[trade.ticker].quantity === 0) {
                   snapshotPositions[trade.ticker].totalInvested = 0;
                 }
@@ -238,7 +238,6 @@ function Dashboard() {
 
         // Now, I'm saving the PnL percentage to Firestore for the leaderboard
         const userProfileRef = doc(db, `artifacts/${appId}/public/data/userProfiles`, user.uid);
-        // I'm using setDoc with merge: true so I only update these specific fields
         await setDoc(userProfileRef, {
           displayName: user.displayName || `User_${user.uid.substring(0, 6)}`, // Using user's display name or a default
           pnlPercentage: parseFloat(currentPnlPercentage.toFixed(2)), // Storing it as a number with 2 decimal places
