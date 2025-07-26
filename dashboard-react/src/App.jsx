@@ -7,7 +7,7 @@ import PostPage from './forum/PostPage';
 import ForumHome from './forum/ForumHome';
 import CreatePost from './forum/CreatePost';
 
-import Leaderboard from './leaderboard/Leaderboard';
+import Leaderboard from './Leaderboard/Leaderboard';
 
 import ProjectionsPage from './projection/projection';
 
