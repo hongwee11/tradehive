@@ -48,5 +48,10 @@ describe('TradeHive E2E Flow', () => {
     cy.get('input[placeholder="Enter P/E ratio"]').clear().type('20');
     cy.get('input[placeholder="Enter desired return"]').clear().type('15');
     cy.contains('Calculation Results').should('exist');
+    
+    cy.contains('Home').click();
+
+    //Go to leaderboard
+    cy.contains('Leaderboard').click();
   });
 });
