@@ -93,7 +93,7 @@ function ProjectionsPage() {
                       value={epsTTM}
                       onChange={(e) => setEpsTTM(e.target.value)}
                       className="projection-input"
-                      placeholder="Enter EPS"
+                      placeholder="Enter EPS (TTM)"
                     />
                   </div>
                   
