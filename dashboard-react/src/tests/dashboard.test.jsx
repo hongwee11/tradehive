@@ -13,7 +13,6 @@ import Dashboard from '../dashboard/dashboard';
 // that our component depends on, isolating the component for testing.
 
 // Mock Firebase Firestore functions
-// We'll provide mock implementations for collection, query, where, getDocs, doc, setDoc
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   query: jest.fn(),
